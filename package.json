@@ -1,0 +1,23 @@
+{
+  "name": "galpi-desktop",
+  "version": "0.2.5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "web": "esbuild Web/app.js --bundle --minify --target=safari16 --outfile=Resources/app.js"
+  },
+  "dependencies": {
+    "@tiptap/core": "^3.0.0",
+    "@tiptap/extension-code-block-lowlight": "3.31.4",
+    "@tiptap/extension-placeholder": "^3.0.0",
+    "@tiptap/extension-task-item": "^3.0.0",
+    "@tiptap/extension-task-list": "^3.0.0",
+    "@tiptap/markdown": "^3.0.0",
+    "@tiptap/starter-kit": "^3.0.0",
+    "lowlight": "3.3.0",
+    "lucide": "^0.468.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

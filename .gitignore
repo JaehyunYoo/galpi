@@ -1,0 +1,58 @@
+# Dependencies and local caches
+node_modules/
+.npm/
+.cache/
+
+# Build outputs, releases, and scratch data
+/build/
+/dist/
+/work/
+.build/
+DerivedData/
+*.app/
+*.dSYM/
+*.xcarchive/
+*.dmg
+/Galpi-*.zip
+
+# Galpi notes, recordings, and backups copied into the repository
+library.json
+library.backup.json
+Recordings/
+History/
+UpgradeBackups/
+
+# Local environment, account credentials, and signing keys
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+.npmrc
+/secrets/
+/credentials/
+*.p12
+*.pfx
+*.p8
+*.key
+*.pem
+*.keychain
+*.keychain-db
+*.mobileprovision
+*.provisionprofile
+
+# macOS and editor-specific state
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+xcuserdata/
+*.xcuserstate
+.idea/
+*.swp
+*.swo
+*~
+*.log
+npm-debug.log*
+
+# Keep package-lock.json, Resources/app.js, app icons, and docs/images/ tracked.
