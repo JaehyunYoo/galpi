@@ -2,15 +2,19 @@
   <img src="docs/images/app-icon.png" alt="Galpi 앱 아이콘 — 두 장의 책갈피" width="112" height="112">
 </p>
 
-# Galpi 0.2.5
+# Galpi 0.3.2
 
-단축키로 꺼내 쓰는 개인용 Mac 메모 앱입니다. 마크다운 메모, 폴더 바로가기, 녹음, ChatGPT 회의록, 사용자 테마를 지원합니다.
+노치와 단축키로 꺼내 쓰는 개인용 Mac 메모 앱입니다. 마크다운 메모, 폴더 바로가기, 녹음, ChatGPT 회의록, 사용자 테마를 지원합니다.
+
+**[macOS 설치 파일 다운로드 · 0.3.2 베타 (DMG)](https://github.com/JaehyunYoo/galpi/releases/download/v0.3.2/Galpi-0.3.2-universal-beta.dmg)** · [ZIP·소스·체크섬 및 변경 사항](https://github.com/JaehyunYoo/galpi/releases/tag/v0.3.2)
+
+macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타이므로 처음 실행할 때 아래의 [설치 안내](#setup)를 확인해 주세요.
 
 ![Galpi 라이트 테마에서 제목·체크리스트·인용을 작성하는 메모 화면](docs/images/notes-light.png)
 
 왼쪽에서 메모를 찾고, 본문에서 제목·체크리스트·코드를 작성합니다. **내 메모 · AI 회의록 · 전체 기록**은 같은 메모 안에서 탭으로 전환합니다.
 
-이 문서의 스크린샷은 **Galpi 0.2.5의 실제 앱 UI**를 예시 데이터로 촬영했습니다. 폴더 경로와 회의 내용은 설명용이며, 회의록 화면은 실제 AI 호출 없이 넣은 예시입니다.
+이 문서의 스크린샷은 **Galpi 0.3.2의 실제 앱 UI**를 예시 데이터로 촬영했습니다. 폴더 경로와 회의 내용은 설명용이며, 회의록 화면은 실제 AI 호출 없이 넣은 예시입니다.
 
 **현재 배포본은 macOS 13 이상을 대상으로 빌드한 Intel·Apple Silicon 공용 베타입니다.** Apple Silicon / macOS 26.3.1에서 자동 테스트를 통과했습니다. 구형 macOS와 Intel 실기기 검증, Developer ID 서명 및 Apple 공증은 아직 완료하지 않았습니다.
 
@@ -22,6 +26,7 @@
 ## 목차
 
 - [설치와 첫 설정](#setup)
+- [노치와 독립 메모 창](#notch)
 - [메모 사용법](#notes)
 - [폴더와 단축키](#shortcuts)
 - [테마 설정](#themes)
@@ -41,10 +46,10 @@
 
 ### 설치
 
-1. `dist/Galpi-0.2.5-universal-beta.dmg`를 엽니다.
+1. [Releases에서 DMG 설치 파일](https://github.com/JaehyunYoo/galpi/releases/tag/v0.3.2)을 내려받아 엽니다. 직접 빌드했다면 `dist/Galpi-0.3.2-universal-beta.dmg`를 사용합니다.
 2. **Galpi.app**을 **Applications** 폴더로 드래그합니다.
 3. 응용 프로그램 폴더의 **Galpi**를 실행합니다. ZIP을 받았다면 압축을 풀고 앱을 응용 프로그램 폴더로 옮깁니다.
-4. 메모 창 오른쪽 위 **설정**에서 폴더·단축키, ChatGPT·음성, 테마를 설정합니다.
+4. 메모 창 오른쪽 위 **설정**에서 메모 단축키·노치, 폴더·단축키, ChatGPT·음성, 테마를 설정합니다.
 
 현재 베타는 Apple 공증을 받지 않아 실행이 차단될 수 있습니다. 신뢰하는 출처에서 받은 파일이라면 한 번 실행을 시도한 뒤 **시스템 설정 → 개인정보 보호 및 보안 → 확인 없이 열기**에서 허용할 수 있습니다. 관리되는 Mac에서는 조직 정책에 따라 허용되지 않을 수 있습니다. [Apple의 앱 실행 안내](https://support.apple.com/102445)
 
@@ -75,6 +80,45 @@
 - 창 위치는 상단 **Galpi / 메모함** 제목 영역이나 빈 공간을 드래그해 옮깁니다. 빠른 실행창도 검색란 위쪽 여백을 잡고 옮길 수 있습니다.
 - 완전히 종료하려면 **Command + Q (`⌘ Q`)**를 누릅니다. 녹음 중이면 저장 후 종료할지 확인합니다.
 - 앱 자체의 로그인 시 자동 실행 설정은 아직 없습니다. 자동 실행을 원하면 macOS의 로그인 항목에서 설치한 Galpi를 직접 추가합니다.
+
+<a id="notch"></a>
+## 노치와 독립 메모 창
+
+**메모는 단축키로 바로 열고, 노치는 빠른 작업에 사용합니다.**
+
+| 진입 방법 | 동작 |
+| --- | --- |
+| `⌃ ⌥ N` | 마지막 메모를 독립 창으로 열고 편집기에 포커스. 메모 창이 활성화된 상태에서 다시 누르면 저장 후 숨김 |
+| `⌃ ⌥ G` 또는 화면 위의 Galpi 노치 클릭 | 최근 메모, 폴더 바로가기, 녹음 패널 열기·접기 |
+| 노치의 메모 또는 **최근 메모** 선택 | 같은 독립 메모 창에서 해당 메모를 이어서 편집 |
+| 노치의 **새 메모** | 새 메모를 만들고 독립 창 열기 |
+| `⌃ ⌥ Space` | 기존 검색용 빠른 실행창 열기 |
+
+**접힌 상태** — 화면 위의 Galpi를 클릭하거나 `⌃ ⌥ G`를 누르면 패널이 열립니다.
+
+<img src="docs/images/notch-collapsed.png" alt="Galpi 이름과 펼치기 화살표를 표시한 접힌 노치" width="341">
+
+**펼친 상태** — 최근 메모, 폴더 바로가기, 녹음을 한곳에서 실행합니다.
+
+![폴더 5개와 스크롤 안내가 표시된 Galpi 노치 패널](docs/images/notch-panel.png)
+
+노치는 노치가 있는 내장 화면에 우선 표시합니다. 해당 화면이 없으면 주 화면 상단 중앙에 표시하고, 디스플레이 구성이 바뀌면 위치를 다시 맞춥니다. 윗부분은 카메라 영역을 비워 둡니다. 다른 앱을 클릭하거나 패널의 접기 버튼·Escape를 누르면 접힙니다.
+
+**등록한 모든 폴더를 스크롤해서 볼 수 있습니다.** 목록은 한 번에 두 개가 보이는 높이로 표시됩니다.
+
+1. **설정 → 폴더·단축키**에서 원하는 폴더를 등록합니다.
+2. 노치를 펼치고 **가운데 폴더 버튼 위**에 포인터를 둡니다.
+3. 마우스 휠이나 트랙패드 두 손가락으로 위아래 스크롤한 뒤 원하는 폴더를 클릭합니다.
+
+폴더가 3개 이상이면 아래에 **↕ 스크롤 · 폴더 N개**가 표시됩니다. 노치 크기와 양옆의 메모·녹음 영역은 유지되고, 가운데 폴더 목록만 움직입니다.
+
+![같은 노치에서 아래로 스크롤해 회의 자료와 보관함 폴더를 표시한 화면](docs/images/notch-folders-scrolled.png)
+
+위 두 화면은 같은 폴더 5개 목록의 처음과 끝입니다. 마지막 폴더까지 스크롤하여 바로 열 수 있습니다.
+
+노치의 **녹음**을 누른 뒤 **대면 · 마이크** 또는 **온라인 · 마이크 + 시스템**을 선택하면 화면에 표시된 메모에 녹음을 첨부합니다. 녹음 중에는 일시정지·계속 녹음·저장 후 종료가 가능하며, 접힌 노치에도 녹음 시간과 상태가 남습니다. 회의록은 해당 메모 창의 **AI 회의록** 탭에서 생성합니다.
+
+**설정 → 폴더·단축키**에서 **메모 창 열기 / 접기**와 **노치 열기 / 접기**의 키 조합을 각각 바꿀 수 있습니다. 노치 항목의 **사용**을 끄면 노치와 전용 단축키가 함께 비활성화됩니다. 다른 기능이 기본 메모 단축키를 사용 중이면 기존 폴더 단축키를 유지하고 충돌 안내를 표시하므로 메모 단축키를 다른 조합으로 지정합니다. 메뉴 막대의 Galpi에서도 **노치 열기 / 접기**를 사용할 수 있습니다.
 
 <a id="notes"></a>
 ## 메모 사용법
@@ -123,7 +167,9 @@
 
 ![빠른 실행 단축키와 프로젝트·다운로드 폴더 바로가기를 등록한 설정 화면](docs/images/folder-shortcuts.png)
 
-*위쪽은 앱의 빠른 실행 단축키, 아래쪽은 폴더별 단축키입니다. 이미지의 `/Users/demo/…`는 예시 경로입니다.*
+*위쪽에서 빠른 실행·메모 창·노치 단축키를 각각 설정하고, 아래쪽에서 폴더별 단축키를 설정합니다. 이미지의 `/Users/demo/…`는 예시 경로입니다.*
+
+등록한 폴더는 [노치의 스크롤 목록](#notch)에서도 클릭하여 열 수 있습니다.
 
 `⌘`, `⌥`, `⌃` 중 하나 이상을 포함해야 합니다. 다른 앱이나 macOS 기능이 사용하는 조합은 등록에 실패할 수 있으므로 다른 조합을 선택합니다. **해제**는 단축키만 지우고, **등록 해제**는 Galpi의 목록에서만 폴더를 제거합니다. 실제 폴더와 파일은 삭제하지 않습니다.
 
@@ -349,21 +395,33 @@ cd ~/Desktop/Galpi
 open dist
 ```
 
-기본 0.2.5 버전에서 생성되는 파일은 다음과 같습니다.
+기본 0.3.2 버전에서 생성되는 파일은 다음과 같습니다.
 
 | 결과물 | 용도 |
 | --- | --- |
-| `Galpi-0.2.5-universal-beta.dmg` | 다른 사람에게 전달할 설치 이미지. 앱, Applications 링크, 설치 안내 포함 |
-| `Galpi-0.2.5-universal-beta.zip` | 앱 번들만 압축한 파일 |
-| `Galpi-0.2.5-source.zip` | 소스·리소스·문서·빌드 스크립트 |
-| `Galpi-0.2.5-universal-beta.json` | 버전, 최소 OS, 아키텍처, 공증 여부, 기기 검증 범위 |
-| `Galpi-0.2.5-universal-beta-SHA256SUMS.txt` | DMG·앱 ZIP·소스 ZIP의 SHA-256 체크섬 |
+| `Galpi-0.3.2-universal-beta.dmg` | 다른 사람에게 전달할 설치 이미지. 앱, Applications 링크, 설치 안내 포함 |
+| `Galpi-0.3.2-universal-beta.zip` | 앱 번들만 압축한 파일 |
+| `Galpi-0.3.2-source.zip` | 소스·리소스·문서·빌드 스크립트 |
+| `Galpi-0.3.2-universal-beta.json` | 버전, 최소 OS, 아키텍처, 공증 여부, 기기 검증 범위 |
+| `Galpi-0.3.2-universal-beta-SHA256SUMS.txt` | DMG·앱 ZIP·소스 ZIP의 SHA-256 체크섬 |
 
 받는 사람에게는 **DMG 또는 앱 ZIP 하나와 설치 안내**를 전달하면 됩니다. 제작자의 데이터 폴더를 함께 보내지 않습니다. 소스 패키지는 명시된 프로젝트 파일만 포함하며 `node_modules`, `work`, `build`, `dist`, 사용자 메모·녹음·로그인 토큰은 포함하지 않습니다.
 
 `release.sh`는 항상 두 아키텍처와 `build/Release/Galpi.app`을 사용합니다. `GALPI_ARCHS`·`GALPI_APP_PATH` 개발 설정은 릴리즈에 적용되지 않습니다. 같은 버전·종류로 다시 실행하면 해당 배포 파일을 교체합니다.
 
 이 스크립트는 로컬 파일만 만듭니다. GitHub Release나 서버에 자동 업로드하지 않습니다. 인증서·공증 프로필을 설정한 경우에는 다음 절의 Apple 공증 업로드가 수행됩니다.
+
+### GitHub Releases에 배포하기
+
+`dist/`는 로컬 배포 결과물 폴더이며 `.gitignore`로 제외합니다. 설치 파일은 [GitHub Releases](https://github.com/JaehyunYoo/galpi/releases)에 첨부하므로 소스 저장소에 큰 바이너리를 커밋할 필요가 없습니다.
+
+1. 버전과 README를 갱신하고 변경된 소스를 커밋·푸시합니다.
+2. `./release.sh`로 설치 파일을 만들고 `dist/`에서 해당 버전의 체크섬을 확인합니다.
+3. 해당 소스 커밋에 `v0.3.2`와 같은 버전 태그를 지정해 GitHub 릴리즈를 만듭니다.
+4. 위 표의 파일 5개를 첨부하고 설치 방법과 검증 범위를 적습니다. 이번 배포 설명은 [`docs/releases/0.3.2.md`](docs/releases/0.3.2.md)에 보관합니다.
+5. 공증 전 빌드는 **Pre-release**로 표시합니다. 업로드된 파일을 확인한 뒤 릴리즈를 공개하고 README 다운로드 링크가 해당 버전을 가리키는지 확인합니다.
+
+공개한 버전의 파일을 교체하기보다 다음 버전으로 배포해 사용자가 내려받은 파일과 체크섬을 일치시킵니다.
 
 <a id="release"></a>
 ## Developer ID 서명과 정식 배포
@@ -421,7 +479,7 @@ GALPI_NOTARY_PROFILE='galpi-notary' \
 4. DMG 생성·서명 후 Apple에 제출, 승인된 DMG에도 티켓 첨부.
 5. 앱의 Gatekeeper 검사 후 최종 DMG·ZIP·소스·체크섬 생성.
 
-성공하면 `dist/Galpi-0.2.5-universal-release.dmg`와 같은 이름의 결과물이 생깁니다. 제출 결과는 `dist/notary-app-0.2.5.json`, `dist/notary-dmg-0.2.5.json`에 남습니다. 인증서와 프로필이 없는 현재 환경에서는 이 공증 경로를 실행 검증하지 않았습니다.
+성공하면 `dist/Galpi-0.3.2-universal-release.dmg`와 같은 이름의 결과물이 생깁니다. 제출 결과는 `dist/notary-app-0.3.2.json`, `dist/notary-dmg-0.3.2.json`에 남습니다. 인증서와 프로필이 없는 현재 환경에서는 이 공증 경로를 실행 검증하지 않았습니다.
 
 서명만 하려면 `GALPI_NOTARY_PROFILE`을 설정하지 않고 Developer ID를 지정합니다. 결과는 `signed-unnotarized`입니다. 임시 서명에 공증 프로필만 지정하거나 Apple Development 인증서를 전달하면 스크립트가 오류로 중단됩니다.
 
@@ -434,8 +492,8 @@ codesign --verify --strict --verbose=2 build/Release/Galpi.app
 xcrun lipo -archs build/Release/Galpi.app/Contents/MacOS/Galpi
 xcrun stapler validate build/Release/Galpi.app
 spctl --assess --type execute --verbose=2 build/Release/Galpi.app
-hdiutil verify dist/Galpi-0.2.5-universal-release.dmg
-xcrun stapler validate dist/Galpi-0.2.5-universal-release.dmg
+hdiutil verify dist/Galpi-0.3.2-universal-release.dmg
+xcrun stapler validate dist/Galpi-0.3.2-universal-release.dmg
 ```
 
 베타는 `codesign --verify`가 성공해도 `stapler`·Gatekeeper 검사에서는 통과하지 않을 수 있습니다. 실제 현재 베타의 Gatekeeper 결과는 `rejected`입니다. 정식 공증본의 검사 결과와 구분합니다.
@@ -444,7 +502,7 @@ xcrun stapler validate dist/Galpi-0.2.5-universal-release.dmg
 
 ```sh
 cd dist
-shasum -a 256 -c Galpi-0.2.5-universal-release-SHA256SUMS.txt
+shasum -a 256 -c Galpi-0.3.2-universal-release-SHA256SUMS.txt
 ```
 
 베타라면 위 파일명에서 `release`를 `beta`로 바꿉니다. 내려받은 실제 DMG·ZIP을 다른 Mac에서 설치해 첫 실행·권한·녹음·로그인을 확인한 뒤 배포합니다. [Apple 공증 안내](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)
@@ -472,8 +530,8 @@ xcrun notarytool log SUBMISSION_ID --keychain-profile "galpi-notary" work/notary
 
 제작자가 새 버전을 낼 때는 다음 항목을 함께 갱신합니다.
 
-- `Resources/Info.plist`: `CFBundleShortVersionString`(예: `0.2.6`)과 `CFBundleVersion`(증가하는 빌드 번호).
-- `package.json`과 `package-lock.json`: 프로젝트 버전. 예를 들어 `npm version 0.2.6 --no-git-tag-version` 사용.
+- `Resources/Info.plist`: `CFBundleShortVersionString`(예: `0.3.3`)과 `CFBundleVersion`(증가하는 빌드 번호).
+- `package.json`과 `package-lock.json`: 프로젝트 버전. 예를 들어 `npm version 0.3.3 --no-git-tag-version` 사용.
 - `Resources/index.html`: 설정 → 데이터의 표시 버전.
 - `README.md`, `INSTALL.txt`: 버전·파일명·지원 범위·변경 내용.
 
@@ -527,12 +585,12 @@ xcrun notarytool log SUBMISSION_ID --keychain-profile "galpi-notary" work/notary
 cd ~/Desktop/Galpi
 GALPI_SELFTEST_DIR="$PWD/work/selftest" \
   build/Release/Galpi.app/Contents/MacOS/Galpi --self-test
-GALPI_TEST_ROOT="$PWD/work/ui-test" ./test-ui.sh
+GALPI_TEST_ROOT="$PWD/work/ui-test" GALPI_UI_TEST_BACKGROUND=1 ./test-ui.sh
 ```
 
 자체 테스트는 데이터 저장·복원, 손상 원본 보존, 사용자 테마, 한글 분할, 전사 시각, 합성 오디오의 M4A 변환과 로그인 루프백 서버를 확인합니다. 로그인 검사는 잘못된 state 거절, 취소, 브라우저 실행 실패 정리까지 수행하며 실제 계정에 로그인하지 않습니다.
 
-UI 테스트는 Hardened Runtime을 켠 WKWebView에서 한글 입력, 체크리스트, 탭 전환, 자동 저장, 고정, 작은 창, 보관·복원, 테마 미리보기·생성·수정·취소와 디스크 저장을 확인합니다. `test-ui.sh`는 현재 Mac의 아키텍처로 실행하며 Intel·이전 macOS 전체를 대신 검증하지 않습니다. 웹 코드를 수정했다면 `npm run web` 또는 `./build.sh`로 번들을 갱신한 뒤 실행합니다.
+UI 테스트는 노치 위치·접기 반복 동작·녹음 방식 선택·표시 설정 저장과 메모 전환 시 미저장 내용 보존을 확인합니다. `GALPI_TEST_NOTCH_CLICKS=1`을 함께 지정하면 테스트용 노치 패널을 잠시 표시하여 접기 버튼의 가운데와 여백 클릭도 확인합니다. 이어서 Hardened Runtime을 켠 WKWebView에서 한글 입력, 체크리스트, 탭 전환, 자동 저장, 고정, 작은 창, 보관·복원, 테마 미리보기·생성·수정·취소와 디스크 저장을 확인합니다. `test-ui.sh`는 현재 Mac의 아키텍처로 실행하며 Intel·이전 macOS 전체를 대신 검증하지 않습니다. 웹 코드를 수정했다면 `npm run web` 또는 `./build.sh`로 번들을 갱신한 뒤 실행합니다.
 
 ### 현재 상태
 
@@ -548,7 +606,7 @@ UI 테스트는 Hardened Runtime을 켠 WKWebView에서 한글 입력, 체크리
 
 ```text
 Galpi/
-├── Sources/                # AppKit, 저장, 단축키, 녹음, 음성 인식, ChatGPT, 테마
+├── Sources/                # AppKit·SwiftUI 노치, 저장, 단축키, 녹음, 음성 인식, ChatGPT, 테마
 ├── Web/                    # 메모 편집기·사용자 테마 UI 원본
 ├── Resources/              # HTML/CSS, 번들 JS, Info.plist, 아이콘, entitlements
 ├── Tools/                  # 아이콘 생성·README 스크린샷 촬영 도구
@@ -588,6 +646,8 @@ iconutil -c icns work/Galpi.iconset -o Resources/Galpi.icns
 ./Tools/capture-readme.sh
 ```
 
-별도 번들 ID와 `work/readme-capture.*/data`의 예시 데이터로 실제 앱 UI를 렌더링해 `docs/images/`에 PNG 7장을 저장합니다. 현재 앱의 메모·설정·키체인·전역 단축키를 사용하지 않으며, 녹음이나 AI 요청도 실행하지 않습니다. 앱 창을 앞에 띄우지 않고 WebKit 화면을 캡처하므로 macOS 창 테두리와 창 제어 버튼은 이미지에 포함되지 않습니다. `Resources/Galpi.icns`의 원본 아이콘도 PNG로 추출합니다.
+별도 번들 ID와 `work/readme-capture.*/data`의 예시 데이터로 실제 앱 UI를 렌더링해 `docs/images/`에 화면 PNG 10장을 저장합니다. 메모·설정 등의 WebKit 화면 7장과 네이티브 노치의 펼친 상태·폴더 목록을 끝까지 스크롤한 상태·접힌 상태 3장입니다. 폴더 스크롤 이미지는 실제 스크롤 뷰를 이동시켜 촬영합니다.
+
+현재 앱의 메모·설정·키체인·전역 단축키를 사용하지 않으며, 녹음이나 AI 요청도 실행하지 않습니다. 앱 창을 앞에 띄우지 않고 콘텐츠만 캡처하므로 macOS 창 테두리와 창 제어 버튼은 이미지에 포함되지 않습니다. `Resources/Galpi.icns`의 원본 아이콘도 PNG로 추출합니다.
 
 예시 내용은 `Tools/CaptureReadme.swift`에서 수정합니다. README의 이미지 경로는 모두 상대 경로이며 `docs/`는 소스 ZIP에도 포함됩니다.

@@ -140,6 +140,9 @@ function setPlayback(data){
 }
 function renderFolders(){
   $('#launcher-key').textContent=library.preferences.launcher?.label||'단축키 설정';
+  $('#notch-key').textContent=library.preferences.notchShortcut?.label||'⌃ ⌥ G';
+  $('#memo-key').textContent=library.preferences.memoShortcut?.label||'⌃ ⌥ N';
+  $('#notch-enabled').checked=library.preferences.notchEnabled!==false;
   const list=$('#folder-list');list.replaceChildren();
   if(!library.folders.length)list.append(el('p','fine','자주 여는 폴더를 등록해보세요.'));
   library.folders.forEach(f=>{
@@ -150,7 +153,7 @@ function renderFolders(){
     actions.append(button('열기',()=>call('openFolder',{folderID:f.id})),button('등록 해제',()=>call('removeFolder',{folderID:f.id})));row.append(actions);list.append(row);
   });paintIcons();
 }
-async function captureShortcut(folderID){$('#shortcut-dialog').hidden=false;try{await call('shortcut',folderID?{folderID}:{});}finally{$('#shortcut-dialog').hidden=true;}}
+async function captureShortcut(folderID,target){$('#shortcut-dialog').hidden=false;try{await call('shortcut',folderID?{folderID}:target?{target}:{});}finally{$('#shortcut-dialog').hidden=true;}}
 function settings(panel='folders'){
   $('#settings').hidden=false;
   $$('[data-settings]').forEach(b=>b.classList.toggle('selected',b.dataset.settings===panel));
@@ -210,6 +213,7 @@ window.Galpi={
     const d=message.data;
     switch(message.event){
       case 'state':mergeState(d);break;
+      case 'openMemo':if(!launcherMode){$('#settings').hidden=true;$('#record-dialog').hidden=true;closeLauncher();selectNote(d.id).then(()=>editor.commands.focus()).catch(e=>toast(e.message,true));}break;
       case 'select':if(!launcherMode)selectNote(d.id).catch(e=>toast(e.message,true));break;
       case 'settings':if(!launcherMode)settings();break;
       case 'launcher':openLauncher();break;
@@ -244,6 +248,9 @@ $('#record-open').onclick=()=>$('#record-dialog').hidden=false;$('#record-cancel
 $('#record-start').onclick=run(async()=>{await flushSave();$('#record-start').disabled=true;try{await call('record',{noteID:selectedID,mode:$('input[name=record-mode]:checked').value});$('#record-dialog').hidden=true;}finally{$('#record-start').disabled=false;}});
 $('#pause-record').onclick=run(()=>call('pause'));$('#stop-record').onclick=run(async()=>{$('#stop-record').disabled=true;try{await call('stop');}finally{$('#stop-record').disabled=false;}});
 $('#transcribe').onclick=run(()=>doJob('transcribe'));$('#generate').onclick=$('#generate-empty').onclick=run(()=>doJob('summarize'));$('#connect-empty').onclick=()=>settings('ai');
+$('#notch-key').onclick=run(()=>captureShortcut(null,'notch'));
+$('#memo-key').onclick=run(()=>captureShortcut(null,'memo'));
+$('#notch-enabled').onchange=run(()=>call('preferences',{notchEnabled:$('#notch-enabled').checked}));
 $('#folder-add').onclick=run(()=>call('addFolder'));$('#launcher-key').onclick=run(()=>captureShortcut());$('#shortcut-cancel').onclick=run(()=>call('cancelShortcut'));
 $('#sign-in').onclick=run(async()=>{const existing=!account.connected?account.selected:undefined;$('#sign-in').disabled=true;try{await call('signIn',existing?{accountID:existing}:{});}catch(error){$('#sign-in').disabled=false;throw error;}});
 $('#cancel-login').onclick=run(async()=>{await call('cancelLogin');account.signingIn=false;renderAccount();});

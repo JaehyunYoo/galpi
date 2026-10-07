@@ -1,10 +1,15 @@
-Galpi 0.2.5 — macOS 13 이상 / Intel·Apple Silicon 공용
+Galpi 0.3.2 — macOS 13 이상 / Intel·Apple Silicon 공용
 
 설치
 1. DMG를 열고 Galpi.app을 Applications 폴더로 드래그합니다.
 2. 응용 프로그램 폴더에서 Galpi를 엽니다.
-3. Control + Option + Space로 빠른 실행창을 엽니다.
-4. 창을 닫아도 메뉴 막대에서 실행됩니다. 완전히 종료하려면 Command + Q를 누릅니다.
+3. Control + Option + N으로 메모 창, Control + Option + G로 노치를 열고 접습니다.
+4. Control + Option + Space로 빠른 실행창을 엽니다. 단축키는 설정 → 폴더·단축키에서 변경합니다.
+5. 노치 가운데 폴더 버튼 위에서 휠이나 트랙패드로 스크롤하면 등록한 모든 폴더를 볼 수 있습니다.
+6. 창을 닫아도 메뉴 막대에서 실행됩니다. 완전히 종료하려면 Command + Q를 누릅니다.
+
+설치 파일과 최신 배포 안내: https://github.com/JaehyunYoo/galpi/releases
+설정·녹음·회의록 사용법: https://github.com/JaehyunYoo/galpi#readme
 
 이 배포 파일의 상태
 파일명에 beta 또는 signed-unnotarized가 있으면 Apple 공증을 받지 않은 테스트 빌드입니다.

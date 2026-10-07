@@ -4,6 +4,21 @@ import AVFoundation
 enum SelfTest {
     @MainActor static func run() async throws {
         guard let path=ProcessInfo.processInfo.environment["GALPI_SELFTEST_DIR"] else {throw AppError("Set GALPI_SELFTEST_DIR to a scratch directory.")}
+        // New preferences remain optional so older libraries decode without losing notes.
+        let legacyPreferences = Data(#"{"launcher":{"key":49,"modifiers":6144,"label":"⌃ ⌥ Space"},"locale":"ko-KR","model":"","compact":false,"alwaysOnTop":false}"#.utf8)
+        var prefs = try JSONDecoder().decode(Preferences.self, from: legacyPreferences)
+        guard prefs.effectiveMemoShortcut.key == 45, prefs.effectiveNotchShortcut.key == 5, prefs.effectiveNotchShortcut.modifiers == 6144, prefs.notchEnabled == nil else { throw AppError("Legacy notch / memo shortcut defaults failed") }
+        prefs.notchEnabled = false; prefs.memoShortcut = Shortcut(key: 46, modifiers: 6144, label: "⌃ ⌥ M")
+        prefs.notchShortcut = Shortcut(key: 5, modifiers: 6400, label: "⌃ ⌥ ⇧ G")
+        let restoredPrefs = try JSONDecoder().decode(Preferences.self, from: JSONEncoder().encode(prefs))
+        guard restoredPrefs.notchEnabled == false, restoredPrefs.effectiveMemoShortcut == prefs.memoShortcut, restoredPrefs.effectiveNotchShortcut == prefs.notchShortcut else { throw AppError("New preferences roundtrip failed") }
+        for geometry in [NotchGeometry(screen: CGRect(x: 0, y: 0, width: 1512, height: 982), cutoutWidth: 180, topInset: 32), NotchGeometry(screen: CGRect(x: -1920, y: 300, width: 1920, height: 1080), cutoutWidth: 0, topInset: 0)] {
+            for expanded in [false, true] {
+                let frame = geometry.frame(expanded: expanded, recordingOptions: true)
+                guard frame.maxY == geometry.screen.maxY, frame.midX == geometry.screen.midX, geometry.screen.contains(frame), frame.width > geometry.cutoutWidth else { throw AppError("Notch / external monitor geometry failed") }
+            }
+        }
+        print("Legacy preferences, memo shortcut persistence and multi-display notch geometry passed.")
         // Exercise the real loopback listener without opening a browser or exchanging credentials.
         var authorizationURL: URL?
         let login=ChatGPT(loadCredentials:false,openBrowser:{authorizationURL=$0;return true})

@@ -53,6 +53,11 @@ struct Preferences: Codable {
     var alwaysOnTop = false
     var theme: String?
     var customThemes: [CustomTheme]?
+    var memoShortcut: Shortcut?
+    var notchShortcut: Shortcut?
+    var notchEnabled: Bool?
+    var effectiveNotchShortcut: Shortcut { notchShortcut ?? Shortcut(key: 5, modifiers: 6144, label: "⌃ ⌥ G") }
+    var effectiveMemoShortcut: Shortcut { memoShortcut ?? Shortcut(key: 45, modifiers: 6144, label: "⌃ ⌥ N") }
 }
 struct Library: Codable {
     var version = 1

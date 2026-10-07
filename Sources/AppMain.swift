@@ -10,6 +10,7 @@ import UniformTypeIdentifiers
     var launcher: NSPanel!
     var launcherWeb: WKWebView!
     var statusItem: NSStatusItem!
+    var notch: NotchController?
     let shortcuts = Shortcuts()
     let chatGPT = ChatGPT(loadCredentials: ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1")
     var recorder: AudioRecorder?
@@ -45,6 +46,7 @@ import UniformTypeIdentifiers
         launcher.contentView=WindowContent(webView:launcherWeb,headerHeight:28,trailingControlsWidth:0)
         load(web,launcherMode:false);load(launcherWeb,launcherMode:true)
         applyAppearance();if ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1" {configureShortcuts()};createStatusItem()
+        notch = NotchController(owner: self, display: ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1")
         chatGPT.status={ [weak self] text,error in self?.emit("notice",["message":text,"error":error]);self?.emit("account",self?.chatGPT.publicState() ?? [:]) }
         timer=Timer.scheduledTimer(withTimeInterval:0.5,repeats:true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
@@ -93,6 +95,7 @@ import UniformTypeIdentifiers
         statusItem.button?.image=NSImage(systemSymbolName:"bookmark.fill",accessibilityDescription:"Galpi")
         let menu=NSMenu()
         menu.addItem(withTitle:"메모 열기",action:#selector(showWindow),keyEquivalent:"").target=self
+        menu.addItem(withTitle:"노치 열기 / 접기",action:#selector(toggleNotch),keyEquivalent:"").target=self
         menu.addItem(withTitle:"빠른 실행",action:#selector(toggleLauncher),keyEquivalent:"").target=self
         menu.addItem(withTitle:"새 메모",action:#selector(newNote),keyEquivalent:"").target=self
         menu.addItem(.separator());menu.addItem(withTitle:"설정…",action:#selector(openSettings),keyEquivalent:"").target=self
@@ -106,8 +109,33 @@ import UniformTypeIdentifiers
             guard let shortcut=folder.shortcut else {continue}
             do {try shortcuts.register(shortcut) { [weak self] in do {try self?.openFolder(folder.id)} catch {self?.emit("notice",["message":error.localizedDescription,"error":true])} }} catch {startupNotices.append(error.localizedDescription)}
         }
+        do { try shortcuts.register(store.library.preferences.effectiveMemoShortcut) { [weak self] in self?.toggleMemo() } }
+        catch { startupNotices.append("메모 창 단축키: " + error.localizedDescription) }
+        if store.library.preferences.notchEnabled ?? true {
+            do { try shortcuts.register(store.library.preferences.effectiveNotchShortcut) { [weak self] in self?.toggleNotch() } }
+            catch { startupNotices.append("노치 단축키: " + error.localizedDescription) }
+        }
     }
-    @objc func showWindow() {NSApp.activate(ignoringOtherApps:true);window.makeKeyAndOrderFront(nil)}
+    @objc func toggleNotch() { notch?.toggle() }
+    @objc func toggleMemo() {
+        if window.isKeyWindow && window.isVisible { flush { self.window.orderOut(nil) } }
+        else { openMemo() }
+    }
+    func openMemo(noteID: String? = nil) {
+        flush { [weak self] in
+            guard let self else { return }
+            do {
+                let candidate = noteID ?? self.store.library.selectedNoteID
+                let note = try self.store.library.notes.first { $0.id == candidate && !$0.deleted } ?? self.store.library.notes.first { !$0.deleted } ?? self.store.create()
+                self.broadcast(); self.showWindow(); self.emit("openMemo", ["id": note.id], only: self.web)
+            } catch { self.emitError(error) }
+        }
+    }
+    @objc func showWindow() {
+        notch?.collapse();launcher?.orderOut(nil)
+        if ProcessInfo.processInfo.environment["GALPI_UI_TEST"] == "1" && ProcessInfo.processInfo.environment["GALPI_UI_TEST_BACKGROUND"] == "1" {return}
+        NSApp.activate(ignoringOtherApps:true);window.makeKeyAndOrderFront(nil)
+    }
     @objc func newNote() {do {let note=try store.create();broadcast();showWindow();emit("select",["id":note.id])}catch{emitError(error)}}
     @objc func openSettings() {showWindow();emit("settings",[:])}
     @objc func toggleLauncher() {
@@ -185,13 +213,14 @@ import UniformTypeIdentifiers
         for view in only.map({[$0]}) ?? [web,launcherWeb].compactMap({$0}) where loaded.contains(ObjectIdentifier(view)) {send(["event":event,"data":data],to:view)}
     }
     func emitError(_ error:Error){emit("notice",["message":error.localizedDescription,"error":true])}
-    func broadcast(){if let state=try? store.snapshot(){emit("state",state)}}
+    func broadcast(){if let state=try? store.snapshot(){emit("state",state)};notch?.refresh()}
     func tick() {
         let recording:[String:Any] = ["active":recorder != nil,"noteID":recordingNoteID ?? "","duration":recorder?.duration ?? 0,"paused":recorder?.isPaused ?? false]
         emit("recording",recording)
         let playbackState: [String: Any] = ["id":playingID ?? "","playing":audioPlayer?.isPlaying ?? false,"time":audioPlayer?.currentTime ?? 0.0,"duration":audioPlayer?.duration ?? 0.0]
         emit("playback",playbackState)
         statusItem?.button?.title=recorder != nil ? " ● \(Int(recorder?.duration ?? 0)/60)m" : ""
+        notch?.refresh()
     }
     func handle(_ action:String,_ a:[String:Any],source:WKWebView) async throws -> Any {
         let id=a["noteID"] as? String ?? store.library.selectedNoteID ?? ""
@@ -205,11 +234,11 @@ import UniformTypeIdentifiers
                 if let text=a["markdown"] as? String {note.markdown=text;note.document=a["document"] as? String}
                 if let text=a["summary"] as? String {note.summary=text}
                 if let text=a["transcript"] as? String {note.transcript=text}
-            };return ["saved":true]
+            };notch?.refresh();return ["saved":true]
         case "create":
             let n=try store.create();broadcast();if source===launcherWeb {launcher.orderOut(nil);showWindow()};emit("select",["id":n.id]);return ["id":n.id]
         case "select":
-            _=try store.note(id);store.library.selectedNoteID=id;try store.persist()
+            _=try store.note(id);store.library.selectedNoteID=id;try store.persist();notch?.refresh()
             if source===launcherWeb {launcher.orderOut(nil);showWindow();emit("select",["id":id],only:web)}
             return try JSONSerialization.jsonObject(with:JSONEncoder().encode(store.note(id)))
         case "pin":try store.update(id) {$0.pinned.toggle()};broadcast();return [:]
@@ -250,6 +279,8 @@ import UniformTypeIdentifiers
             let shortcut=try await captureShortcut()
             let old=store.library
             if let target,let i=store.library.folders.firstIndex(where:{$0.id==target}) {store.library.folders[i].shortcut=shortcut}
+            else if a["target"] as? String == "memo" {store.library.preferences.memoShortcut=shortcut}
+            else if a["target"] as? String == "notch" {store.library.preferences.notchShortcut=shortcut}
             else {store.library.preferences.launcher=shortcut}
             configureShortcuts()
             if !startupNotices.isEmpty {let error=startupNotices.joined(separator:"\n");store.library=old;configureShortcuts();throw AppError(error)}
@@ -274,9 +305,11 @@ import UniformTypeIdentifiers
                 guard ["system","light","dark"].contains(theme) || (store.library.preferences.customThemes ?? []).contains(where:{$0.id==theme}) else {throw AppError("지원하지 않는 화면 모드예요.")}
                 store.library.preferences.theme=theme
             }
+            if let enabled=a["notchEnabled"] as? Bool {store.library.preferences.notchEnabled=enabled}
             if let locale=a["locale"] as? String {store.library.preferences.locale=locale}
             if let model=a["model"] as? String {store.library.preferences.model=model}
             do {try store.persist()}catch{store.library.preferences=previous;throw error}
+            if a["notchEnabled"] != nil && ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1" {configureShortcuts();if !startupNotices.isEmpty {emit("notice",["message":startupNotices.joined(separator:"\n"),"error":true])}}
             applyAppearance();broadcast();return [:]
         case "saveTheme":
             guard let name=a["name"] as? String,let colors=a["colors"] as? [String:String] else {throw AppError("테마 이름과 색상을 입력해 주세요.")}

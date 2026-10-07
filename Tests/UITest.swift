@@ -18,7 +18,9 @@ import WebKit
                     try? await Task.sleep(for: .seconds(45))
                     fputs("UI test timed out\n", stderr);exit(1)
                 }
-                try await Task.sleep(for:.seconds(1))
+                while !delegate.loaded.contains(ObjectIdentifier(delegate.web)) || !delegate.loaded.contains(ObjectIdentifier(delegate.launcherWeb)) {
+                    try await Task.sleep(for: .milliseconds(50))
+                }
                 let result:Any?=try await withCheckedThrowingContinuation { continuation in
                     delegate.web.callAsyncJavaScript(script,arguments:[:],in:nil,in:.page) {continuation.resume(with:$0)}
                 }
@@ -49,6 +51,55 @@ import WebKit
                         try png.write(to:directory.appendingPathComponent("Galpi-code-\(theme).png"))
                     }
                 }
+                guard let notch = delegate.notch else { throw AppError("Missing notch controller") }
+                notch.refresh(); notch.toggle()
+                guard notch.state.expanded, let geometry = notch.geometry,
+                      abs(notch.panel.frame.maxY - geometry.screen.maxY) < 1,
+                      notch.state.notes.contains(where: { $0.id == code.id }) else { throw AppError("Notch content / anchor failed") }
+                notch.act(.recordOptions)
+                guard notch.state.recordingOptions, delegate.recorder == nil else { throw AppError("Opening recording choices must not start recording") }
+                notch.act(.collapse)
+                guard !notch.state.expanded, !notch.state.recordingOptions else { throw AppError("Notch collapse failed") }
+                notch.act(.collapse)
+                guard !notch.state.expanded, abs(notch.panel.frame.width - geometry.collapsedSize.width) < 1, abs(notch.panel.frame.height - geometry.collapsedSize.height) < 1 else { throw AppError("Repeated collapse must stay collapsed with the compact frame") }
+                notch.toggle(); notch.toggle()
+                guard !notch.state.expanded, !notch.panel.isKeyWindow else { throw AppError("Toggle must use the same collapse and release focus") }
+                if ProcessInfo.processInfo.environment["GALPI_TEST_NOTCH_CLICKS"] == "1" {
+                    // Deliver local mouse events to the real hosting view, without moving
+                    // the user's pointer or posting keyboard events to another app.
+                    for offset in [NSPoint(x: 0, y: 0), NSPoint(x: -12, y: 9), NSPoint(x: 12, y: -9)] {
+                        notch.toggle()
+                        notch.panel.orderFrontRegardless()
+                        try await Task.sleep(for: .milliseconds(150))
+                        notch.panel.contentView?.layoutSubtreeIfNeeded()
+                        let point = NSPoint(x: notch.panel.frame.width - 36 + offset.x,
+                                            y: notch.panel.frame.height - geometry.topInset - 22 + offset.y)
+                        let down = NSEvent.mouseEvent(with: .leftMouseDown, location: point, modifierFlags: [],
+                            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: notch.panel.windowNumber,
+                            context: nil, eventNumber: 1, clickCount: 1, pressure: 1)!
+                        let up = NSEvent.mouseEvent(with: .leftMouseUp, location: point, modifierFlags: [],
+                            timestamp: ProcessInfo.processInfo.systemUptime + 0.05, windowNumber: notch.panel.windowNumber,
+                            context: nil, eventNumber: 2, clickCount: 1, pressure: 0)!
+                        app.postEvent(down, atStart: false); app.postEvent(up, atStart: false)
+                        try await Task.sleep(for: .milliseconds(250))
+                        guard !notch.state.expanded else { throw AppError("Collapse button did not receive click at offset \(offset)") }
+                    }
+                    notch.panel.orderOut(nil)
+                    print("Native collapse button center and padding clicks passed")
+                }
+                _ = try await delegate.handle("preferences", ["notchEnabled": false], source: delegate.web)
+                guard !notch.panel.isVisible, try Store(root: delegate.store.root).library.preferences.notchEnabled == false else { throw AppError("Notch opt-out persistence failed") }
+                _ = try await delegate.handle("preferences", ["notchEnabled": true], source: delegate.web)
+                let _: Any? = try await withCheckedThrowingContinuation { continuation in
+                    delegate.web.callAsyncJavaScript("const body=document.querySelector('#editor .tiptap');body.focus();const range=document.createRange();range.selectNodeContents(document.querySelector('#editor pre code'));range.collapse(false);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);document.execCommand('insertText',false,' // pending-notch-save');", arguments: [:], in: nil, in: .page) { continuation.resume(with: $0) }
+                }
+                delegate.openMemo(noteID: note.id)
+                let _: Any? = try await withCheckedThrowingContinuation { continuation in
+                    delegate.web.callAsyncJavaScript("for(let i=0;i<120;i++){if(document.querySelector('#note-title').value==='한글 메모 📝')return;await new Promise(r=>setTimeout(r,30));}throw Error('Notch note selection failed');", arguments: [:], in: nil, in: .page) { continuation.resume(with: $0) }
+                }
+                guard try Store(root: delegate.store.root).note(code.id).markdown.contains("pending-notch-save"),
+                      delegate.store.library.selectedNoteID == note.id else { throw AppError("Opening memo must flush pending edits and select requested note") }
+                print("Notch position, recording choices, toggle persistence and unsaved-note handoff passed")
                 print(result ?? "No result");print("Native WKWebView UI + disk roundtrip passed");exit(0)
             } catch {fputs("UI test failed: \(error) \((error as NSError).userInfo)\n",stderr);exit(1)}
         }

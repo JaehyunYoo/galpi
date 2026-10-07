@@ -37,7 +37,9 @@ import WebKit
                 try await waitTheme(web, "light")
                 try await select(web, id: "docs-notes", title: "오늘의 작업 메모")
                 try await js(web, "document.querySelector('#settings-open').click(); document.querySelector('[data-settings=folders]').click();")
+                delegate.window.setContentSize(NSSize(width: 980, height: 920))
                 try await capture(web, output, "folder-shortcuts")
+                delegate.window.setContentSize(NSSize(width: 980, height: 760))
 
                 try await js(web, "document.querySelector('[data-settings=appearance]').click(); document.querySelector('[data-theme-edit]').click();")
                 try await capture(web, output, "theme-editor")
@@ -51,12 +53,46 @@ import WebKit
 
                 try await js(web, "document.querySelector('#settings-open').click(); document.querySelector('[data-settings=ai]').click();")
                 try await capture(web, output, "chatgpt-settings")
-                print("Captured 7 app screens using example data; no recording or AI request was started.")
+                if let notch = delegate.notch {
+                    delegate.store.library.folders += [
+                        Folder(id: "docs-folder-3", name: "디자인 자료", path: "/Users/demo/Design"),
+                        Folder(id: "docs-folder-4", name: "회의 자료", path: "/Users/demo/Meetings"),
+                        Folder(id: "docs-folder-5", name: "보관함", path: "/Users/demo/Archive")
+                    ]
+                    notch.refresh(); notch.toggle()
+                    try await Task.sleep(for: .milliseconds(350))
+                    guard let view = notch.panel.contentView else { throw AppError("Missing native notch view") }
+                    try captureNative(view, output, "notch-panel")
+                    guard let scroll = findScrollView(view), let document = scroll.documentView,
+                          document.bounds.height > scroll.contentView.bounds.height else { throw AppError("Folder list must scroll with five example folders") }
+                    let bottom = document.isFlipped ? document.bounds.maxY - scroll.contentView.bounds.height : document.bounds.minY
+                    scroll.contentView.scroll(to: NSPoint(x: 0, y: bottom))
+                    scroll.reflectScrolledClipView(scroll.contentView)
+                    try await Task.sleep(for: .milliseconds(350))
+                    try captureNative(view, output, "notch-folders-scrolled")
+                    notch.collapse()
+                    try await Task.sleep(for: .milliseconds(350))
+                    try captureNative(view, output, "notch-collapsed")
+                }
+                print("Captured 10 app screens using example data; no recording or AI request was started.")
                 exit(0)
             } catch { fputs("Screenshot capture failed: \(error)\n", stderr); exit(1) }
         }
         app.run()
         withExtendedLifetime(delegate) {}
+    }
+
+    @MainActor static func findScrollView(_ view: NSView) -> NSScrollView? {
+        if let scroll = view as? NSScrollView { return scroll }
+        return view.subviews.lazy.compactMap { findScrollView($0) }.first
+    }
+
+    @MainActor static func captureNative(_ view: NSView, _ output: URL, _ name: String) throws {
+        view.layoutSubtreeIfNeeded()
+        guard let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { throw AppError("Notch bitmap unavailable") }
+        view.cacheDisplay(in: view.bounds, to: bitmap)
+        guard let png = bitmap.representation(using: .png, properties: [:]) else { throw AppError("Notch PNG unavailable") }
+        try png.write(to: output.appendingPathComponent(name + ".png"))
     }
 
     static func seed(_ root: URL) throws {
