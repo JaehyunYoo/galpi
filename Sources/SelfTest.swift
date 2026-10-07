@@ -4,10 +4,11 @@ import AVFoundation
 enum SelfTest {
     @MainActor static func run() async throws {
         guard let path=ProcessInfo.processInfo.environment["GALPI_SELFTEST_DIR"] else {throw AppError("Set GALPI_SELFTEST_DIR to a scratch directory.")}
+        try await claudeIntegration()
         // New preferences remain optional so older libraries decode without losing notes.
         let legacyPreferences = Data(#"{"launcher":{"key":49,"modifiers":6144,"label":"⌃ ⌥ Space"},"locale":"ko-KR","model":"","compact":false,"alwaysOnTop":false}"#.utf8)
         var prefs = try JSONDecoder().decode(Preferences.self, from: legacyPreferences)
-        guard prefs.effectiveMemoShortcut.key == 45, prefs.effectiveNotchShortcut.key == 5, prefs.effectiveNotchShortcut.modifiers == 6144, prefs.notchEnabled == nil else { throw AppError("Legacy notch / memo shortcut defaults failed") }
+        guard prefs.effectiveMemoShortcut.key == 45, prefs.effectiveNotchShortcut.key == 5, prefs.effectiveNotchShortcut.modifiers == 6144, prefs.notchEnabled == nil, prefs.effectiveAIProvider == "chatgpt", prefs.effectiveClaudeModel == "sonnet" else { throw AppError("Legacy notch / memo shortcut defaults failed") }
         prefs.notchEnabled = false; prefs.memoShortcut = Shortcut(key: 46, modifiers: 6144, label: "⌃ ⌥ M")
         prefs.notchShortcut = Shortcut(key: 5, modifiers: 6400, label: "⌃ ⌥ ⇧ G")
         let restoredPrefs = try JSONDecoder().decode(Preferences.self, from: JSONEncoder().encode(prefs))
@@ -78,6 +79,51 @@ enum SelfTest {
         let locales=await LocalTranscription.locales()
         print("Persistence, recovery, Unicode, transcript timestamps, synthetic audio export passed.")
         print("Available Korean locales: \(locales.filter{$0.hasPrefix("ko")}.joined(separator:", "))")
+    }
+
+    @MainActor private static func claudeIntegration() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("Galpi-Claude-Test-" + UUID().uuidString)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let fixture = directory.appendingPathComponent("claude")
+        let script = #"""
+        #!/bin/sh
+        if [ "$1" = "auth" ]; then
+          printf '%s' '{"loggedIn":true,"authMethod":"claude.ai","subscriptionType":"max"}'
+          exit 0
+        fi
+        /bin/cat >/dev/null
+        printf '%s' '{"type":"result","subtype":"success","is_error":false,"result":"## 핵심 요약\nfixture 회의록"}'
+        """#
+        try script.write(to: fixture, atomically: true, encoding: .utf8)
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: fixture.path)
+        let client = ClaudeCLI(executable: fixture)
+        try await client.refresh()
+        guard client.connected, client.authMethod == "claude.ai" else { throw AppError("Claude login status parsing failed") }
+        let summary = try await client.summarize(text: "회의 내용", model: "sonnet", progress: { _ in })
+        guard summary.contains("fixture 회의록") else { throw AppError("Claude subprocess summary failed") }
+        for payload in [#"{"type":"result","subtype":"success","is_error":true,"result":"실패"}"#,
+                        #"{"type":"result","subtype":"error_max_turns","is_error":false,"result":"미완료"}"#,
+                        #"{"type":"result","subtype":"success","is_error":false,"result":" "}"#] {
+            var rejected = false
+            do { _ = try ClaudeCLI.summaryResult(Data(payload.utf8)) } catch { rejected = true }
+            guard rejected else { throw AppError("Incomplete Claude response accepted") }
+        }
+        let payload = Data(String(repeating: "한글 meeting\n", count: 20000).utf8)
+        let echo = try await CLICommand.run(URL(fileURLWithPath: "/bin/cat"), arguments: [], input: payload, timeout: 5)
+        guard echo.output == payload, echo.status == 0 else { throw AppError("Large Claude stdin/stdout deadlocked or truncated") }
+        let rejectedInput = try await CLICommand.run(URL(fileURLWithPath: "/usr/bin/false"), arguments: [], input: payload, timeout: 5)
+        guard rejectedInput.status != 0 else { throw AppError("Early Claude subprocess exit was lost") }
+        var timedOut = false
+        let started = Date()
+        do { _ = try await CLICommand.run(URL(fileURLWithPath: "/bin/sleep"), arguments: ["10"], timeout: 0.1) } catch { timedOut = true }
+        guard timedOut, Date().timeIntervalSince(started) < 5 else { throw AppError("Claude command timeout failed") }
+        let pending = Task { try await CLICommand.run(URL(fileURLWithPath: "/bin/sleep"), arguments: ["10"], timeout: 15) }
+        try await Task.sleep(for: .milliseconds(100)); pending.cancel()
+        var cancelled = false
+        do { _ = try await pending.value } catch is CancellationError { cancelled = true }
+        guard cancelled else { throw AppError("Claude command cancellation failed") }
+        print("Claude login, summary, failure preservation, pipe draining, timeout and cancellation passed (offline fixtures).")
     }
 
     private static func welcomeMigration(root: URL) throws {

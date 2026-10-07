@@ -13,6 +13,7 @@ import UniformTypeIdentifiers
     var notch: NotchController?
     let shortcuts = Shortcuts()
     let chatGPT = ChatGPT(loadCredentials: ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1")
+    let claude = ClaudeCLI(enabled: ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1")
     var recorder: AudioRecorder?
     var recordingNoteID: String?
     var recordingID: String?
@@ -48,6 +49,7 @@ import UniformTypeIdentifiers
         applyAppearance();if ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1" {configureShortcuts()};createStatusItem()
         notch = NotchController(owner: self, display: ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1")
         chatGPT.status={ [weak self] text,error in self?.emit("notice",["message":text,"error":error]);self?.emit("account",self?.chatGPT.publicState() ?? [:]) }
+        claude.changed = { [weak self] in self?.emit("claude", self?.claude.publicState() ?? [:]) }
         timer=Timer.scheduledTimer(withTimeInterval:0.5,repeats:true) { [weak self] _ in
             Task { @MainActor in self?.tick() }
         }
@@ -168,7 +170,7 @@ import UniformTypeIdentifiers
             Task { @MainActor in
                 do {
                     if self?.recorder != nil {try await self?.stopRecording()}
-                    try self?.store.persist();self?.chatGPT.cancelLogin();NSApp.reply(toApplicationShouldTerminate:true)
+                    try self?.store.persist();self?.chatGPT.cancelLogin();self?.claude.cancelLogin();CLICommand.cancelAll();NSApp.reply(toApplicationShouldTerminate:true)
                 } catch { self?.emitError(error);NSApp.reply(toApplicationShouldTerminate:false) }
             }
         };return .terminateLater
@@ -227,7 +229,7 @@ import UniformTypeIdentifiers
         switch action {
         case "ready":
             loaded.insert(ObjectIdentifier(source))
-            return ["library":try store.snapshot(),"account":chatGPT.publicState(),"notices":startupNotices,"dataPath":store.root.path]
+            return ["library":try store.snapshot(),"account":chatGPT.publicState(),"claude":claude.publicState(),"notices":startupNotices,"dataPath":store.root.path]
         case "save":
             try store.update(id) {note in
                 if let title=a["title"] as? String {note.title=title.isEmpty ? "제목 없는 메모" : String(title.prefix(500))}
@@ -301,6 +303,8 @@ import UniformTypeIdentifiers
             return ["url":value]
         case "preferences":
             let previous=store.library.preferences
+            if let provider = a["aiProvider"] as? String, !["chatgpt", "claude"].contains(provider) { throw AppError("지원하지 않는 AI 서비스예요.") }
+            if let model = a["claudeModel"] as? String, !["sonnet", "opus"].contains(model) { throw AppError("지원하지 않는 Claude 모델이에요.") }
             if let theme=a["theme"] as? String {
                 guard ["system","light","dark"].contains(theme) || (store.library.preferences.customThemes ?? []).contains(where:{$0.id==theme}) else {throw AppError("지원하지 않는 화면 모드예요.")}
                 store.library.preferences.theme=theme
@@ -308,6 +312,8 @@ import UniformTypeIdentifiers
             if let enabled=a["notchEnabled"] as? Bool {store.library.preferences.notchEnabled=enabled}
             if let locale=a["locale"] as? String {store.library.preferences.locale=locale}
             if let model=a["model"] as? String {store.library.preferences.model=model}
+            if let provider=a["aiProvider"] as? String {store.library.preferences.aiProvider=provider}
+            if let model=a["claudeModel"] as? String {store.library.preferences.claudeModel=model}
             do {try store.persist()}catch{store.library.preferences=previous;throw error}
             if a["notchEnabled"] != nil && ProcessInfo.processInfo.environment["GALPI_UI_TEST"] != "1" {configureShortcuts();if !startupNotices.isEmpty {emit("notice",["message":startupNotices.joined(separator:"\n"),"error":true])}}
             applyAppearance();broadcast();return [:]
@@ -328,6 +334,11 @@ import UniformTypeIdentifiers
             guard panel.runModal() == .OK,let url=panel.url else {return [:]}
             let data=try JSONSerialization.data(withJSONObject:["version":1,"name":theme.name,"colors":theme.colors],options:[.prettyPrinted,.sortedKeys]);try data.write(to:url,options:.atomic);return [:]
         case "locales":return await LocalTranscription.locales()
+        case "claudeStatus":try await claude.refresh();return claude.publicState()
+        case "claudeSignIn":try claude.signIn();return claude.publicState()
+        case "claudeCancelLogin":claude.cancelLogin();return claude.publicState()
+        case "claudeInstall":NSWorkspace.shared.open(URL(string:"https://code.claude.com/docs/en/setup")!);return [:]
+        case "claudeLoginCommand":NSPasteboard.general.clearContents();NSPasteboard.general.setString("claude auth login",forType:.string);return [:]
         case "signIn":try await chatGPT.signIn(existingID:a["accountID"] as? String);return [:]
         case "cancelLogin":chatGPT.cancelLogin();return [:]
         case "signOut":defer{emit("account",chatGPT.publicState())};try await chatGPT.signOut();return [:]
@@ -347,6 +358,8 @@ import UniformTypeIdentifiers
             NSWorkspace.shared.open(store.recordingDirectory(r.id));return [:]
         case "transcribe","summarize":
             guard !jobs.contains(id),recordingNoteID != id else {throw AppError("진행 중인 작업이 끝난 뒤 다시 시도해 주세요.")}
+            let provider = store.library.preferences.effectiveAIProvider
+            let model = provider == "claude" ? store.library.preferences.effectiveClaudeModel : store.library.preferences.model
             jobs.insert(id);defer{jobs.remove(id);emit("job",["noteID":id,"message":"","busy":false])}
             let progress:(String)->Void = { [weak self] message in Task { @MainActor in self?.emit("job",["noteID":id,"message":message,"busy":true]) } }
             let needsTranscript = try store.note(id).transcript.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty
@@ -355,7 +368,9 @@ import UniformTypeIdentifiers
                 let original=try store.note(id)
                 guard !original.transcript.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty else {throw AppError("전체 기록에 전사문이 있어야 회의록을 만들 수 있어요.")}
                 let text="회의 제목: \(original.title)\n\n직접 쓴 메모:\n\(original.markdown)\n\n회의 대화 기록:\n\(original.transcript)"
-                let summary=try await chatGPT.summarize(text:text,model:store.library.preferences.model,progress:progress)
+                let summary: String
+                if provider == "claude" { summary = try await claude.summarize(text:text,model:model,progress:progress) }
+                else { summary = try await chatGPT.summarize(text:text,model:model,progress:progress) }
                 let latest=try store.note(id);try store.archiveSummary(latest)
                 if latest.summary != original.summary {
                     let generated=try store.create(title:latest.title+" · 새 회의록",markdown:summary);emit("notice",["message":"수정 중인 회의록을 보존하고 새 메모에 생성했어요.","error":false]);emit("select",["id":generated.id])

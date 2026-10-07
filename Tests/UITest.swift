@@ -51,6 +51,8 @@ import WebKit
                         try png.write(to:directory.appendingPathComponent("Galpi-code-\(theme).png"))
                     }
                 }
+                let aiPreferences = try Store(root: delegate.store.root).library.preferences
+                guard aiPreferences.effectiveAIProvider == "claude", aiPreferences.effectiveClaudeModel == "opus" else { throw AppError("Claude provider/model persistence failed") }
                 guard let notch = delegate.notch else { throw AppError("Missing notch controller") }
                 notch.refresh(); notch.toggle()
                 guard notch.state.expanded, let geometry = notch.geometry,

@@ -2,11 +2,11 @@
   <img src="docs/images/app-icon.png" alt="Galpi 앱 아이콘 — 두 장의 책갈피" width="112" height="112">
 </p>
 
-# Galpi 0.3.2
+# Galpi 0.4.0
 
-노치와 단축키로 꺼내 쓰는 개인용 Mac 메모 앱입니다. 마크다운 메모, 폴더 바로가기, 녹음, ChatGPT 회의록, 사용자 테마를 지원합니다.
+노치와 단축키로 꺼내 쓰는 개인용 Mac 메모 앱입니다. 마크다운 메모, 폴더 바로가기, 녹음, ChatGPT·Claude 회의록, 사용자 테마를 지원합니다.
 
-**[macOS 설치 파일 다운로드 · 0.3.2 베타 (DMG)](https://github.com/JaehyunYoo/galpi/releases/download/v0.3.2/Galpi-0.3.2-universal-beta.dmg)** · [ZIP·소스·체크섬 및 변경 사항](https://github.com/JaehyunYoo/galpi/releases/tag/v0.3.2)
+**[macOS 설치 파일 다운로드 · 0.4.0 베타 (DMG)](https://github.com/JaehyunYoo/galpi/releases/download/v0.4.0/Galpi-0.4.0-universal-beta.dmg)** · [ZIP·소스·체크섬 및 변경 사항](https://github.com/JaehyunYoo/galpi/releases/tag/v0.4.0)
 
 macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타이므로 처음 실행할 때 아래의 [설치 안내](#setup)를 확인해 주세요.
 
@@ -14,7 +14,7 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 
 왼쪽에서 메모를 찾고, 본문에서 제목·체크리스트·코드를 작성합니다. **내 메모 · AI 회의록 · 전체 기록**은 같은 메모 안에서 탭으로 전환합니다.
 
-이 문서의 스크린샷은 **Galpi 0.3.2의 실제 앱 UI**를 예시 데이터로 촬영했습니다. 폴더 경로와 회의 내용은 설명용이며, 회의록 화면은 실제 AI 호출 없이 넣은 예시입니다.
+이 문서의 스크린샷은 **Galpi 0.4.0의 실제 앱 UI**를 예시 데이터로 촬영했습니다. 폴더 경로와 회의 내용은 설명용이며, 회의록 화면은 실제 AI 호출 없이 넣은 예시입니다.
 
 **현재 배포본은 macOS 13 이상을 대상으로 빌드한 Intel·Apple Silicon 공용 베타입니다.** Apple Silicon / macOS 26.3.1에서 자동 테스트를 통과했습니다. 구형 macOS와 Intel 실기기 검증, Developer ID 서명 및 Apple 공증은 아직 완료하지 않았습니다.
 
@@ -31,7 +31,7 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 - [폴더와 단축키](#shortcuts)
 - [테마 설정](#themes)
 - [녹음과 회의록 생성](#meetings)
-- [ChatGPT 연결과 모델 설정](#chatgpt)
+- [ChatGPT·Claude 연결과 모델 설정](#chatgpt)
 - [데이터 보관·백업·복원](#data)
 - [개발 환경과 빌드](#build)
 - [테스트용 배포](#beta)
@@ -46,10 +46,10 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 
 ### 설치
 
-1. [Releases에서 DMG 설치 파일](https://github.com/JaehyunYoo/galpi/releases/tag/v0.3.2)을 내려받아 엽니다. 직접 빌드했다면 `dist/Galpi-0.3.2-universal-beta.dmg`를 사용합니다.
+1. [Releases에서 DMG 설치 파일](https://github.com/JaehyunYoo/galpi/releases/tag/v0.4.0)을 내려받아 엽니다. 직접 빌드했다면 `dist/Galpi-0.4.0-universal-beta.dmg`를 사용합니다.
 2. **Galpi.app**을 **Applications** 폴더로 드래그합니다.
 3. 응용 프로그램 폴더의 **Galpi**를 실행합니다. ZIP을 받았다면 압축을 풀고 앱을 응용 프로그램 폴더로 옮깁니다.
-4. 메모 창 오른쪽 위 **설정**에서 메모 단축키·노치, 폴더·단축키, ChatGPT·음성, 테마를 설정합니다.
+4. 메모 창 오른쪽 위 **설정**에서 메모 단축키·노치, 폴더·단축키, AI·음성, 테마를 설정합니다.
 
 현재 베타는 Apple 공증을 받지 않아 실행이 차단될 수 있습니다. 신뢰하는 출처에서 받은 파일이라면 한 번 실행을 시도한 뒤 **시스템 설정 → 개인정보 보호 및 보안 → 확인 없이 열기**에서 허용할 수 있습니다. 관리되는 Mac에서는 조직 정책에 따라 허용되지 않을 수 있습니다. [Apple의 앱 실행 안내](https://support.apple.com/102445)
 
@@ -58,7 +58,7 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 1. 새 메모를 만들고 제목과 내용을 입력합니다. 아래에 **내 맥에 저장됨**이 표시되는지 확인합니다.
 2. **Control + Option + Space (`⌃ ⌥ Space`)**로 빠른 실행창을 엽니다.
 3. **설정 → 폴더·단축키**에서 자주 쓰는 폴더를 등록합니다.
-4. **설정 → ChatGPT·음성 → Continue with ChatGPT**로 로그인하고 **회의록 모델**을 선택합니다.
+4. **설정 → AI·음성 → Continue with ChatGPT**로 로그인하고 **회의록 모델**을 선택합니다.
 5. 같은 화면에서 **녹음 언어**를 선택합니다. 기본값은 한국어 `ko-KR`입니다.
 6. 짧은 녹음을 저장한 뒤 **AI 회의록 → 회의록 생성**을 실행합니다.
 
@@ -213,7 +213,7 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 
 ### 이미 녹음과 GPT 연결을 마쳤다면
 
-1. **설정 → ChatGPT·음성 → 회의록 모델**을 선택합니다. 연결 후 처음 한 번은 모델 선택이 필요합니다.
+1. **설정 → AI·음성 → 회의록 모델**을 선택합니다. 연결 후 처음 한 번은 모델 선택이 필요합니다.
 2. **녹음이 붙어 있는 메모**로 돌아갑니다.
 3. **AI 회의록 → 회의록 생성**을 누릅니다.
 
@@ -241,11 +241,13 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 이전 AI 회의록은 `History/`에 보관한 뒤 새 결과로 바뀝니다. 생성 중 사용자가 회의록을 직접 수정하면 수정 내용을 보존하고 생성 결과를 새 메모로 저장합니다. 긴 기록은 구간별로 정리한 뒤 합쳐서 여러 번의 AI 요청이 발생할 수 있습니다. 전체 기록과 직접 쓴 메모를 함께 사용하므로 회의 목적·용어를 메모에 적어두면 도움이 됩니다.
 
 <a id="chatgpt"></a>
-## ChatGPT 연결과 모델 설정
+## ChatGPT·Claude 연결과 모델 설정
 
-### 연결
+설정의 **회의록을 만들 AI**에서 ChatGPT 또는 Claude를 선택합니다. 기존 사용자의 ChatGPT 연결과 모델은 유지되며, Claude 모델은 별도로 저장됩니다.
 
-1. **설정 → ChatGPT·음성 → Continue with ChatGPT**를 누릅니다.
+### ChatGPT 연결
+
+1. **설정 → AI·음성**에서 **ChatGPT**를 선택하고 **Continue with ChatGPT**를 누릅니다.
 2. 기본 브라우저에서 본인 ChatGPT 계정으로 로그인합니다.
 3. 해당 계정과 워크스페이스를 확인하고 앱의 플랜 사용 권한을 승인합니다.
 4. Galpi로 돌아와 연결된 계정을 확인합니다.
@@ -262,17 +264,35 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 
 연결한 뒤 **다른 ChatGPT 계정 추가**로 계정을 추가할 수 있습니다. 계정 선택 목록에서 전환한 뒤 사용할 모델을 다시 선택합니다. **로그아웃**하면 현재 연결의 로컬 토큰을 지우고 원격 세션 해제를 요청합니다. 원격 해제를 확인하지 못했다는 안내가 나오면 ChatGPT 설정에서도 Galpi 연결을 해제합니다. 사용 한도와 앱 접근 권한은 ChatGPT 설정에서 확인합니다. [계정·세션 안내](https://developers.openai.com/siwc/token-sharing-open-source/profiles-and-sessions)
 
+### Claude 연결
+
+![Claude Code 설치·로그인·연결 확인과 Sonnet·Opus 선택을 제공하는 설정 화면](docs/images/claude-settings.png)
+
+1. [Anthropic 공식 안내](https://code.claude.com/docs/en/setup)에 따라 **Claude Code**를 설치합니다. 갈피 배포 파일에는 Claude Code가 포함되지 않습니다.
+2. **설정 → AI·음성 → 회의록을 만들 AI → Claude · Claude Code 연결**을 선택합니다.
+3. 이미 Claude Code에 로그인되어 있으면 **연결 확인**으로 계정 상태를 확인합니다. 처음 사용한다면 **Claude Code 로그인**을 눌러 공식 브라우저 인증을 완료합니다.
+4. 로그인 창이 열리지 않으면 **로그인 명령 복사**를 누르고 터미널에 붙여넣어 실행합니다. 완료 후 갈피에서 **연결 확인**을 누릅니다.
+5. **Claude 회의록 모델**에서 Sonnet 또는 Opus를 선택합니다. 실제 사용 가능 모델과 사용 한도는 계정에 따릅니다.
+6. 메모의 **AI 회의록 → 회의록 생성**을 누릅니다. ChatGPT로 다시 바꾸려면 AI 선택 항목만 변경합니다.
+
+공식 Claude Code 실행 파일을 그대로 호출하며, 로그인과 계정 관리는 Claude Code에서 진행합니다. 갈피는 Claude OAuth 토큰을 읽거나 저장하지 않습니다. Claude Code를 다른 도구에서도 사용한다면 같은 로그인 상태를 공유합니다. 일반적인 설치 위치인 `~/.local/bin/claude`, `/opt/homebrew/bin/claude`, `/usr/local/bin/claude`와 앱 실행 환경의 PATH에서 실행 파일을 찾습니다.
+
+**비용과 한도:** Claude Code에 연결한 계정과 제공자의 조건을 따릅니다. 구독 계정으로 연결해도 제3자 도구 사용에는 추가 사용 크레딧이 청구될 수 있으며, 구독에 포함된 한도만 사용한다고 보장하지 않습니다. API 또는 외부 제공자 인증이면 해당 사용량 요금이 적용될 수 있습니다. 설정에서 현재 인증 종류를 확인할 수 있습니다. [Anthropic 계정 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account) · [공식 Claude Code 인증·제품 연동 안내](https://code.claude.com/docs/en/legal-and-compliance)
+
+회의록 생성 시 메모·전사문을 표준 입력으로 전달합니다. 파일·셸 도구, MCP, 훅·스킬과 세션 저장을 끄고 빈 임시 작업 폴더에서 실행합니다. 로그인 대기는 취소할 수 있고, 응답이 실패하거나 시간 초과가 나면 기존 회의록을 유지합니다. 이 연결 방식에는 갈피에 Anthropic API 키를 직접 입력하는 UI가 없습니다.
+
 ### 어떤 데이터가 전송되나
 
 | 데이터 | 처리·저장 위치 |
 | --- | --- |
 | 녹음 원본과 재생 파일 | 이 Mac의 Galpi 데이터 폴더 |
 | 음성 → 글 변환 | Apple의 로컬 음성 인식. 지원하지 않으면 오류를 알리고 중단 |
-| 회의 제목·내 메모·전체 기록 | 회의록 생성 시 OpenAI로 전송 |
+| 회의 제목·내 메모·전체 기록 | 선택한 AI에 따라 OpenAI 또는 Claude Code에 연결한 서비스로 전송 |
 | ChatGPT 로그인 토큰 | 이 앱에 발급된 토큰만 macOS 키체인에 보관 |
+| Claude 로그인 정보 | 공식 Claude Code가 관리. 갈피는 토큰을 읽거나 저장하지 않음 |
 | AI 회의록 결과 | Galpi 데이터 폴더에 저장 |
 
-현재 구현은 음성 파일을 OpenAI로 보내지 않습니다. 계정 연결만으로 기존 ChatGPT 대화 내용을 가져오지도 않습니다. 회의록 생성과 모델 목록 조회에는 인터넷 연결이 필요합니다.
+현재 구현은 음성 파일을 AI 서비스로 보내지 않습니다. 계정 연결만으로 기존 ChatGPT 대화 내용을 가져오지도 않습니다. 회의록 생성과 모델 목록 조회에는 인터넷 연결이 필요합니다.
 
 ### 서명 키와 GPT 키의 차이
 
@@ -395,15 +415,15 @@ cd ~/Desktop/Galpi
 open dist
 ```
 
-기본 0.3.2 버전에서 생성되는 파일은 다음과 같습니다.
+기본 0.4.0 버전에서 생성되는 파일은 다음과 같습니다.
 
 | 결과물 | 용도 |
 | --- | --- |
-| `Galpi-0.3.2-universal-beta.dmg` | 다른 사람에게 전달할 설치 이미지. 앱, Applications 링크, 설치 안내 포함 |
-| `Galpi-0.3.2-universal-beta.zip` | 앱 번들만 압축한 파일 |
-| `Galpi-0.3.2-source.zip` | 소스·리소스·문서·빌드 스크립트 |
-| `Galpi-0.3.2-universal-beta.json` | 버전, 최소 OS, 아키텍처, 공증 여부, 기기 검증 범위 |
-| `Galpi-0.3.2-universal-beta-SHA256SUMS.txt` | DMG·앱 ZIP·소스 ZIP의 SHA-256 체크섬 |
+| `Galpi-0.4.0-universal-beta.dmg` | 다른 사람에게 전달할 설치 이미지. 앱, Applications 링크, 설치 안내 포함 |
+| `Galpi-0.4.0-universal-beta.zip` | 앱 번들만 압축한 파일 |
+| `Galpi-0.4.0-source.zip` | 소스·리소스·문서·빌드 스크립트 |
+| `Galpi-0.4.0-universal-beta.json` | 버전, 최소 OS, 아키텍처, 공증 여부, 기기 검증 범위 |
+| `Galpi-0.4.0-universal-beta-SHA256SUMS.txt` | DMG·앱 ZIP·소스 ZIP의 SHA-256 체크섬 |
 
 받는 사람에게는 **DMG 또는 앱 ZIP 하나와 설치 안내**를 전달하면 됩니다. 제작자의 데이터 폴더를 함께 보내지 않습니다. 소스 패키지는 명시된 프로젝트 파일만 포함하며 `node_modules`, `work`, `build`, `dist`, 사용자 메모·녹음·로그인 토큰은 포함하지 않습니다.
 
@@ -417,8 +437,8 @@ open dist
 
 1. 버전과 README를 갱신하고 변경된 소스를 커밋·푸시합니다.
 2. `./release.sh`로 설치 파일을 만들고 `dist/`에서 해당 버전의 체크섬을 확인합니다.
-3. 해당 소스 커밋에 `v0.3.2`와 같은 버전 태그를 지정해 GitHub 릴리즈를 만듭니다.
-4. 위 표의 파일 5개를 첨부하고 설치 방법과 검증 범위를 적습니다. 이번 배포 설명은 [`docs/releases/0.3.2.md`](docs/releases/0.3.2.md)에 보관합니다.
+3. 해당 소스 커밋에 `v0.4.0`와 같은 버전 태그를 지정해 GitHub 릴리즈를 만듭니다.
+4. 위 표의 파일 5개를 첨부하고 설치 방법과 검증 범위를 적습니다. 이번 배포 설명은 [`docs/releases/0.4.0.md`](docs/releases/0.4.0.md)에 보관합니다.
 5. 공증 전 빌드는 **Pre-release**로 표시합니다. 업로드된 파일을 확인한 뒤 릴리즈를 공개하고 README 다운로드 링크가 해당 버전을 가리키는지 확인합니다.
 
 공개한 버전의 파일을 교체하기보다 다음 버전으로 배포해 사용자가 내려받은 파일과 체크섬을 일치시킵니다.
@@ -479,7 +499,7 @@ GALPI_NOTARY_PROFILE='galpi-notary' \
 4. DMG 생성·서명 후 Apple에 제출, 승인된 DMG에도 티켓 첨부.
 5. 앱의 Gatekeeper 검사 후 최종 DMG·ZIP·소스·체크섬 생성.
 
-성공하면 `dist/Galpi-0.3.2-universal-release.dmg`와 같은 이름의 결과물이 생깁니다. 제출 결과는 `dist/notary-app-0.3.2.json`, `dist/notary-dmg-0.3.2.json`에 남습니다. 인증서와 프로필이 없는 현재 환경에서는 이 공증 경로를 실행 검증하지 않았습니다.
+성공하면 `dist/Galpi-0.4.0-universal-release.dmg`와 같은 이름의 결과물이 생깁니다. 제출 결과는 `dist/notary-app-0.4.0.json`, `dist/notary-dmg-0.4.0.json`에 남습니다. 인증서와 프로필이 없는 현재 환경에서는 이 공증 경로를 실행 검증하지 않았습니다.
 
 서명만 하려면 `GALPI_NOTARY_PROFILE`을 설정하지 않고 Developer ID를 지정합니다. 결과는 `signed-unnotarized`입니다. 임시 서명에 공증 프로필만 지정하거나 Apple Development 인증서를 전달하면 스크립트가 오류로 중단됩니다.
 
@@ -492,8 +512,8 @@ codesign --verify --strict --verbose=2 build/Release/Galpi.app
 xcrun lipo -archs build/Release/Galpi.app/Contents/MacOS/Galpi
 xcrun stapler validate build/Release/Galpi.app
 spctl --assess --type execute --verbose=2 build/Release/Galpi.app
-hdiutil verify dist/Galpi-0.3.2-universal-release.dmg
-xcrun stapler validate dist/Galpi-0.3.2-universal-release.dmg
+hdiutil verify dist/Galpi-0.4.0-universal-release.dmg
+xcrun stapler validate dist/Galpi-0.4.0-universal-release.dmg
 ```
 
 베타는 `codesign --verify`가 성공해도 `stapler`·Gatekeeper 검사에서는 통과하지 않을 수 있습니다. 실제 현재 베타의 Gatekeeper 결과는 `rejected`입니다. 정식 공증본의 검사 결과와 구분합니다.
@@ -502,7 +522,7 @@ xcrun stapler validate dist/Galpi-0.3.2-universal-release.dmg
 
 ```sh
 cd dist
-shasum -a 256 -c Galpi-0.3.2-universal-release-SHA256SUMS.txt
+shasum -a 256 -c Galpi-0.4.0-universal-release-SHA256SUMS.txt
 ```
 
 베타라면 위 파일명에서 `release`를 `beta`로 바꿉니다. 내려받은 실제 DMG·ZIP을 다른 Mac에서 설치해 첫 실행·권한·녹음·로그인을 확인한 뒤 배포합니다. [Apple 공증 안내](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)
@@ -530,8 +550,8 @@ xcrun notarytool log SUBMISSION_ID --keychain-profile "galpi-notary" work/notary
 
 제작자가 새 버전을 낼 때는 다음 항목을 함께 갱신합니다.
 
-- `Resources/Info.plist`: `CFBundleShortVersionString`(예: `0.3.3`)과 `CFBundleVersion`(증가하는 빌드 번호).
-- `package.json`과 `package-lock.json`: 프로젝트 버전. 예를 들어 `npm version 0.3.3 --no-git-tag-version` 사용.
+- `Resources/Info.plist`: `CFBundleShortVersionString`(예: `0.4.1`)과 `CFBundleVersion`(증가하는 빌드 번호).
+- `package.json`과 `package-lock.json`: 프로젝트 버전. 예를 들어 `npm version 0.4.1 --no-git-tag-version` 사용.
 - `Resources/index.html`: 설정 → 데이터의 표시 버전.
 - `README.md`, `INSTALL.txt`: 버전·파일명·지원 범위·변경 내용.
 
@@ -547,6 +567,8 @@ xcrun notarytool log SUBMISSION_ID --keychain-profile "galpi-notary" work/notary
 | 기본 브라우저를 열지 못했다는 안내 | macOS 기본 웹 브라우저 설정 확인 후 재시도 |
 | 로그인 후 앱으로 돌아오지 않음 | Galpi를 켠 상태에서 브라우저 승인을 완료. 대기 시간이 끝났다면 로그인 취소 후 새로 시작. 이전 시도의 콜백 주소를 재사용하지 않음 |
 | GPT는 연결됐는데 생성 시 설정이 열림 | **회의록 모델**도 선택해야 함. 계정 전환 뒤 모델 재선택 |
+| Claude가 설치되지 않았다고 표시 | 공식 설치 안내를 따라 설치한 뒤 연결 확인. 일반 설치 경로 또는 앱의 PATH에서 찾을 수 있어야 함 |
+| Claude 로그인·회의록 생성 실패 | Claude Code 로그인 상태, Sonnet·Opus 접근 권한, 사용 한도와 크레딧 확인. 최신 Claude Code로 업데이트 후 재시도 |
 | 모델 목록이 비어 있거나 요청 거절 | 모델 새로고침, 인터넷, 연결 계정과 ChatGPT 사용 한도 확인. 연결을 해제·재연결한 뒤 모델 재선택 |
 | 녹음이 안 되거나 상대방 소리가 없음 | 대면/온라인 모드 확인. 마이크와 화면·시스템 오디오 권한 확인. 다른 입력 장치가 선택돼 있다면 macOS 사운드 설정 확인 |
 | 글로 변환이 오래 걸림 | 최초 언어 데이터 다운로드와 로컬 처리 진행 상태 확인. 긴 녹음은 시간이 더 필요함 |
@@ -597,6 +619,8 @@ UI 테스트는 노치 위치·접기 반복 동작·녹음 방식 선택·표�
 - Apple Silicon / macOS 26.3.1에서 위 자동 테스트 통과.
 - arm64·x86_64 양쪽의 최소 배포 버전 macOS 13.0 확인.
 - 생성된 DMG 마운트·무결성, ZIP 추출본과 빌드 바이너리 일치, 번들 서명 검증 완료.
+- Claude Code 2.1.292에서 가상 회의 입력으로 실제 Claude 회의록 생성 확인. 개인 메모·녹음은 테스트에 사용하지 않음.
+- Claude 인증 상태·결과 파싱·큰 입력·시간 초과·취소는 오프라인 대역으로 검증. AI 선택·Claude 모델 저장은 격리된 UI 테스트로 확인.
 - 사용자 환경에서 녹음 실행과 ChatGPT 연결 완료 제보가 있었음. 자동 테스트와 별개이며 녹음 모드별 품질·전체 회의록 생성 성공까지 확인한 것은 아님.
 - Intel·macOS 13~15 실기기 실행, 언어별 인식 품질, 긴 온라인 회의의 동기화, 회의록 생성 전체 흐름은 추가 확인 필요.
 - Developer ID 서명·Apple 공증 경로는 관련 인증 정보 준비 후 검증 필요.
@@ -606,7 +630,7 @@ UI 테스트는 노치 위치·접기 반복 동작·녹음 방식 선택·표�
 
 ```text
 Galpi/
-├── Sources/                # AppKit·SwiftUI 노치, 저장, 단축키, 녹음, 음성 인식, ChatGPT, 테마
+├── Sources/                # 노치, 저장, 단축키, 녹음, 음성 인식, ChatGPT·Claude 연결, 테마
 ├── Web/                    # 메모 편집기·사용자 테마 UI 원본
 ├── Resources/              # HTML/CSS, 번들 JS, Info.plist, 아이콘, entitlements
 ├── Tools/                  # 아이콘 생성·README 스크린샷 촬영 도구
@@ -646,7 +670,7 @@ iconutil -c icns work/Galpi.iconset -o Resources/Galpi.icns
 ./Tools/capture-readme.sh
 ```
 
-별도 번들 ID와 `work/readme-capture.*/data`의 예시 데이터로 실제 앱 UI를 렌더링해 `docs/images/`에 화면 PNG 10장을 저장합니다. 메모·설정 등의 WebKit 화면 7장과 네이티브 노치의 펼친 상태·폴더 목록을 끝까지 스크롤한 상태·접힌 상태 3장입니다. 폴더 스크롤 이미지는 실제 스크롤 뷰를 이동시켜 촬영합니다.
+별도 번들 ID와 `work/readme-capture.*/data`의 예시 데이터로 실제 앱 UI를 렌더링해 `docs/images/`에 화면 PNG 11장을 저장합니다. 메모·설정 등의 WebKit 화면 8장과 네이티브 노치의 펼친 상태·폴더 목록을 끝까지 스크롤한 상태·접힌 상태 3장입니다. 폴더 스크롤 이미지는 실제 스크롤 뷰를 이동시켜 촬영합니다.
 
 현재 앱의 메모·설정·키체인·전역 단축키를 사용하지 않으며, 녹음이나 AI 요청도 실행하지 않습니다. 앱 창을 앞에 띄우지 않고 콘텐츠만 캡처하므로 macOS 창 테두리와 창 제어 버튼은 이미지에 포함되지 않습니다. `Resources/Galpi.icns`의 원본 아이콘도 PNG로 추출합니다.
 

@@ -49,6 +49,10 @@ struct Preferences: Codable {
     var launcher = Shortcut(key: 49, modifiers: 6144, label: "⌃ ⌥ Space")
     var locale = "ko-KR"
     var model = ""
+    var aiProvider: String?
+    var claudeModel: String?
+    var effectiveAIProvider: String { aiProvider == "claude" ? "claude" : "chatgpt" }
+    var effectiveClaudeModel: String { claudeModel ?? "sonnet" }
     var compact = false
     var alwaysOnTop = false
     var theme: String?

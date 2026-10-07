@@ -1,4 +1,4 @@
-Galpi 0.3.2 — macOS 13 이상 / Intel·Apple Silicon 공용
+Galpi 0.4.0 — macOS 13 이상 / Intel·Apple Silicon 공용
 
 설치
 1. DMG를 열고 Galpi.app을 Applications 폴더로 드래그합니다.
@@ -24,9 +24,15 @@ macOS에서 실행을 막을 수 있습니다. 직접 신뢰하는 출처에서 
 • 대면 녹음: 마이크 권한. 온라인 녹음: 마이크와 화면/시스템 오디오 녹음 권한.
 • 로컬 음성 변환: Mac 기종·macOS·언어와 설치된 Apple 인식 데이터에 따라 달라집니다.
   지원하지 않으면 전체 기록 탭에 전사문을 붙여넣어 회의록을 만들 수 있습니다.
-• ChatGPT: 설정 → ChatGPT·음성 → Continue with ChatGPT에서 본인 계정으로 연결합니다.
+• ChatGPT: 설정 → AI·음성 → Continue with ChatGPT에서 본인 계정으로 연결합니다.
   대상 ChatGPT 플랜과 기능 이용 권한이 필요합니다. 별도 API 키는 입력하지 않습니다.
   회의록 생성 시 메모와 전사문이 OpenAI로 전송됩니다. 음성 파일은 전송하지 않습니다.
+• Claude: 공식 Claude Code를 별도로 설치하고 본인 계정으로 로그인합니다.
+  설정 → AI·음성에서 Claude를 선택한 뒤 연결 확인 → Sonnet 또는 Opus를 선택합니다.
+  로그인 정보는 Claude Code가 관리하며 갈피가 읽거나 저장하지 않습니다.
+  회의록 생성 시 메모·전사문이 Claude Code에 연결한 서비스로 전송됩니다.
+  계정의 사용 한도와 과금 조건이 적용되며 추가 사용 크레딧이 청구될 수 있습니다.
+  설치 안내: https://code.claude.com/docs/en/setup
 
 데이터
 메모와 녹음은 ~/Library/Application Support/Galpi 에 저장됩니다.

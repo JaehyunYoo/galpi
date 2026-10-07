@@ -104,6 +104,18 @@ $('[data-theme-choice=light]').click();await until(()=>document.documentElement.
 check(getComputedStyle(document.body).backgroundColor==='rgb(255, 254, 253)','Custom colors cleared for built-in themes');
 check(getComputedStyle($('#editor .hljs-keyword')).color!==darkKeyword,'Code palette follows light theme');
 $('.custom-theme-choice').click();await until(()=>document.documentElement.dataset.themeId===themeID,'custom theme reselected');
+$('[data-settings=ai]').click();
+check($('#ai-provider').value==='chatgpt'&&!$('#chatgpt-settings').hidden&&$('#claude-settings').hidden,'Legacy AI selection remains ChatGPT');
+$('#ai-provider').value='claude';$('#ai-provider').dispatchEvent(new Event('change',{bubbles:true}));
+await until(()=>!$('#claude-settings').hidden&&$('#chatgpt-settings').hidden,'Claude provider panel');
+await until(()=>$('#claude-sign-in').disabled&&$('#claude-status').textContent.includes('설치'),'Missing CLI offers installation without reading real credentials');
+check($('#summary-provider-hint').textContent.includes('Claude'),'Summary destination follows provider');
+$('#claude-model').value='opus';$('#claude-model').dispatchEvent(new Event('change',{bubbles:true}));
+await pause(150);
+$('#ai-provider').value='chatgpt';$('#ai-provider').dispatchEvent(new Event('change',{bubbles:true}));
+await until(()=>!$('#chatgpt-settings').hidden,'Switch back to ChatGPT');
+$('#ai-provider').value='claude';$('#ai-provider').dispatchEvent(new Event('change',{bubbles:true}));
+await until(()=>!$('#claude-settings').hidden&&$('#claude-model').value==='opus','Claude model preserved across provider switch');
 $('#settings-close').click();
 await window.Galpi.flushAsync();
 return 'Korean notes, autosave, archive/restore, code highlighting/language/persistence/read-only state and custom themes passed';

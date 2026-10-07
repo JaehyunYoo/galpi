@@ -53,6 +53,10 @@ import WebKit
 
                 try await js(web, "document.querySelector('#settings-open').click(); document.querySelector('[data-settings=ai]').click();")
                 try await capture(web, output, "chatgpt-settings")
+                try await js(web, "document.querySelector('#ai-provider').value='claude'; document.querySelector('#ai-provider').dispatchEvent(new Event('change',{bubbles:true})); for(let i=0;i<100 && document.querySelector('#claude-settings').hidden;i++) await new Promise(r=>setTimeout(r,20));")
+                delegate.window.setContentSize(NSSize(width: 980, height: 920))
+                try await capture(web, output, "claude-settings")
+                delegate.window.setContentSize(NSSize(width: 980, height: 760))
                 if let notch = delegate.notch {
                     delegate.store.library.folders += [
                         Folder(id: "docs-folder-3", name: "디자인 자료", path: "/Users/demo/Design"),
@@ -74,7 +78,7 @@ import WebKit
                     try await Task.sleep(for: .milliseconds(350))
                     try captureNative(view, output, "notch-collapsed")
                 }
-                print("Captured 10 app screens using example data; no recording or AI request was started.")
+                print("Captured 11 app screens using example data; no recording or AI request was started.")
                 exit(0)
             } catch { fputs("Screenshot capture failed: \(error)\n", stderr); exit(1) }
         }

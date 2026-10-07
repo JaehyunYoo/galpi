@@ -12,7 +12,7 @@ const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll
 const native=window.webkit?.messageHandlers?.galpi;
 const launcherMode=new URLSearchParams(location.search).has('launcher');
 document.body.classList.toggle('is-launcher',launcherMode);
-let library={notes:[],folders:[],preferences:{}},account={accounts:[],connected:false},selectedID=null,tab='memo',showTrash=false,loading=false;
+let library={notes:[],folders:[],preferences:{}},account={accounts:[],connected:false},claude={installed:false,connected:false},selectedID=null,tab='memo',showTrash=false,loading=false;
 let recording={active:false},playback={},saveTimer,toastTimer,launchIndex=0,launchItems=[],slashFrom=null,blockIndex=0;
 const pending=new Map(),dirty=new Map(),inflight=new Map(),jobs=new Map();
 let saving=Promise.resolve();
@@ -158,8 +158,24 @@ function settings(panel='folders'){
   $('#settings').hidden=false;
   $$('[data-settings]').forEach(b=>b.classList.toggle('selected',b.dataset.settings===panel));
   $$('[data-settings-panel]').forEach(p=>p.hidden=p.dataset.settingsPanel!==panel);
-  if(panel==='ai'){renderAccount();loadLocales();if(account.connected)loadModels().catch(e=>toast(e.message,true));}
+  if(panel==='ai'){renderAccount();renderAI();loadLocales();if(aiProvider()==='claude')refreshClaude().catch(e=>toast(e.message,true));else if(account.connected)loadModels().catch(e=>toast(e.message,true));}
 }
+function aiProvider(){return library.preferences.aiProvider==='claude'?'claude':'chatgpt';}
+function renderAI(){
+  const useClaude=aiProvider()==='claude';
+  $('#ai-provider').value=aiProvider();$('#chatgpt-settings').hidden=useClaude;$('#claude-settings').hidden=!useClaude;
+  $('#claude-model').value=library.preferences.claudeModel||'sonnet';
+  $('#summary-provider-hint').textContent=`전체 기록과 직접 쓴 메모를 ${useClaude?'Claude':'ChatGPT'}에 보내 요약·결정 사항·할 일을 정리해요.`;
+  $('#claude-status').textContent=claude.message||'연결 확인을 눌러 주세요.';
+  const busy=claude.checking||claude.signingIn;
+  $('#claude-refresh').disabled=Boolean(busy);$('#claude-sign-in').disabled=!claude.installed||Boolean(busy);
+  $('#claude-sign-in').textContent=claude.connected?'Claude 계정 다시 연결':'Claude Code 로그인';
+  $('#claude-cancel-login').hidden=!claude.signingIn;
+  $('#claude-billing').textContent=claude.connected
+    ? (['claude.ai','oauth_token'].includes(claude.authMethod)?`Claude 구독 계정${claude.plan?' · '+claude.plan:''} 연결됨. 사용 한도와 추가 요금은 Claude Code 계정 조건을 따라요. 추가 사용 크레딧이 청구될 수 있어요.`:'Claude Code의 API 또는 외부 제공자 인증을 사용해요. 해당 계정에 사용량 요금이 청구될 수 있어요.')
+    : '사용 한도와 추가 요금은 Claude Code에 연결한 계정 조건을 따라요. 추가 사용 크레딧이 청구될 수 있어요.';
+}
+async function refreshClaude(){claude=await call('claudeStatus');renderAI();return claude;}
 function renderAccount(){
   const list=$('#account-list');list.replaceChildren();
   if(account.accounts.length){const select=el('select');select.setAttribute('aria-label','ChatGPT 계정');account.accounts.forEach(a=>{const o=el('option','',`${a.email} · ${a.id.slice(-6)}${a.connected?'':' · 다시 연결 필요'}`);o.value=a.id;select.append(o)});select.value=account.selected;select.addEventListener('change',run(async()=>{await call('selectAccount',{accountID:select.value});await loadModels()}));list.append(select);}
@@ -181,7 +197,12 @@ async function loadLocales(){
 }
 async function doJob(action){
   await flushSave();const n=note();if(!n)return;
-  if(action==='summarize'&&(!account.connected||!library.preferences.model)){settings('ai');toast('ChatGPT 계정과 회의록 모델을 설정해 주세요.');return;}
+  if(action==='summarize'){
+    if(aiProvider()==='claude'){
+      const state=await refreshClaude();
+      if(!state.connected||state.signingIn||state.checking){settings('ai');toast('Claude Code 설치와 로그인을 확인해 주세요.');return;}
+    }else if(!account.connected||!library.preferences.model){settings('ai');toast('ChatGPT 계정과 회의록 모델을 설정해 주세요.');return;}
+  }
   const id=n.id;jobs.set(id,action==='transcribe'?'음성 변환 준비 중…':'회의록 생성 준비 중…');renderEditorState();
   try{const updated=await call(action,{noteID:id});const i=library.notes.findIndex(n=>n.id===id);if(i>=0)library.notes[i]=updated;if(selectedID===id){tab=action==='transcribe'?'transcript':'summary';showNote();}}
   finally{jobs.delete(id);renderEditorState();}
@@ -194,13 +215,13 @@ function renderLauncher(){
   if(!q||queryMatch('새 메모 만들기',q))launchItems.push({title:'새 메모',sub:'바로 쓰기 시작',icon:'square-pen',action:()=>call('create')});
   for(const n of library.notes.filter(n=>!n.deleted&&queryMatch(n.title+' '+n.markdown+' '+n.summary,q)).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.updated-a.updated).slice(0,7))launchItems.push({title:n.title,sub:'메모',icon:'file-text',action:()=>launcherMode?call('select',{noteID:n.id}):selectNote(n.id)});
   for(const f of library.folders.filter(f=>queryMatch(f.name+' '+f.path,q)))launchItems.push({title:f.name,sub:f.path,icon:'folder',shortcut:f.shortcut?.label,action:()=>call('openFolder',{folderID:f.id})});
-  if(!q||queryMatch('설정 단축키 ChatGPT 폴더',q))launchItems.push({title:'설정',sub:'폴더, 단축키, ChatGPT',icon:'settings-2',action:()=>launcherMode?call('settings'):settings()});
+  if(!q||queryMatch('설정 단축키 AI ChatGPT Claude 폴더',q))launchItems.push({title:'설정',sub:'폴더, 단축키, AI 연결',icon:'settings-2',action:()=>launcherMode?call('settings'):settings()});
   launchIndex=Math.max(0,Math.min(launchIndex,launchItems.length-1));
   const list=$('#launcher-results');list.replaceChildren();if(!launchItems.length)list.append(el('div','list-empty','검색 결과가 없어요.'));
   launchItems.forEach((item,index)=>{const row=button('',async()=>{await flushSave();await item.action();closeLauncher();});row.className='launch-result'+(index===launchIndex?' selected':'');row.append(icon(item.icon));const copy=el('div','launch-copy');copy.append(el('span','',item.title),el('small','',item.sub));row.append(copy);if(item.shortcut)row.append(el('kbd','',item.shortcut));list.append(row);});paintIcons();
 }
 async function init(){
-  try{const result=await call('ready');library=result.library;account=result.account;$('#data-path').textContent=result.dataPath;mergeState(library);renderAccount();
+  try{const result=await call('ready');library=result.library;account=result.account;claude=result.claude||claude;$('#data-path').textContent=result.dataPath;mergeState(library);renderAccount();renderAI();
     if(launcherMode){openLauncher();}else{await selectNote(library.selectedNoteID||library.notes.find(n=>!n.deleted)?.id);}
     if(result.notices.length)toast(result.notices.join('\n'),true);
   }catch(e){toast(e.message,true);}
@@ -212,7 +233,8 @@ window.Galpi={
     if(message.id){const promise=pending.get(message.id);if(!promise)return;pending.delete(message.id);message.error?promise.reject(new Error(message.error)):promise.resolve(message.result);return;}
     const d=message.data;
     switch(message.event){
-      case 'state':mergeState(d);break;
+      case 'state':mergeState(d);renderAI();break;
+      case 'claude':claude=d;renderAI();break;
       case 'openMemo':if(!launcherMode){$('#settings').hidden=true;$('#record-dialog').hidden=true;closeLauncher();selectNote(d.id).then(()=>editor.commands.focus()).catch(e=>toast(e.message,true));}break;
       case 'select':if(!launcherMode)selectNote(d.id).catch(e=>toast(e.message,true));break;
       case 'settings':if(!launcherMode)settings();break;
@@ -252,6 +274,13 @@ $('#notch-key').onclick=run(()=>captureShortcut(null,'notch'));
 $('#memo-key').onclick=run(()=>captureShortcut(null,'memo'));
 $('#notch-enabled').onchange=run(()=>call('preferences',{notchEnabled:$('#notch-enabled').checked}));
 $('#folder-add').onclick=run(()=>call('addFolder'));$('#launcher-key').onclick=run(()=>captureShortcut());$('#shortcut-cancel').onclick=run(()=>call('cancelShortcut'));
+$('#ai-provider').onchange=run(async()=>{const provider=$('#ai-provider').value;try{await call('preferences',{aiProvider:provider});library.preferences.aiProvider=provider;renderAI();if(provider==='claude')await refreshClaude();else if(account.connected)await loadModels();}finally{renderAI();}});
+$('#claude-model').onchange=run(()=>call('preferences',{claudeModel:$('#claude-model').value}));
+$('#claude-refresh').onclick=run(refreshClaude);
+$('#claude-sign-in').onclick=run(async()=>{claude=await call('claudeSignIn');renderAI();});
+$('#claude-cancel-login').onclick=run(async()=>{claude=await call('claudeCancelLogin');renderAI();});
+$('#claude-install').onclick=run(()=>call('claudeInstall'));
+$('#claude-login-command').onclick=run(async()=>{await call('claudeLoginCommand');toast('로그인 명령을 복사했어요. 터미널에 붙여넣어 실행해 주세요.');});
 $('#sign-in').onclick=run(async()=>{const existing=!account.connected?account.selected:undefined;$('#sign-in').disabled=true;try{await call('signIn',existing?{accountID:existing}:{});}catch(error){$('#sign-in').disabled=false;throw error;}});
 $('#cancel-login').onclick=run(async()=>{await call('cancelLogin');account.signingIn=false;renderAccount();});
 $('#sign-out').onclick=run(()=>call('signOut'));$('#reload-models').onclick=run(loadModels);
