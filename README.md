@@ -2,11 +2,11 @@
   <img src="docs/images/app-icon.png" alt="Galpi 앱 아이콘 — 두 장의 책갈피" width="112" height="112">
 </p>
 
-# Galpi 0.4.0
+# Galpi 0.4.1
 
 노치와 단축키로 꺼내 쓰는 개인용 Mac 메모 앱입니다. 마크다운 메모, 폴더 바로가기, 녹음, ChatGPT·Claude 회의록, 사용자 테마를 지원합니다.
 
-**[macOS 설치 파일 다운로드 · 0.4.0 베타 (DMG)](https://github.com/JaehyunYoo/galpi/releases/download/v0.4.0/Galpi-0.4.0-universal-beta.dmg)** · [ZIP·소스·체크섬 및 변경 사항](https://github.com/JaehyunYoo/galpi/releases/tag/v0.4.0)
+**[macOS 설치 파일 다운로드 · 0.4.1 베타 (DMG)](https://github.com/JaehyunYoo/galpi/releases/download/v0.4.1/Galpi-0.4.1-universal-beta.dmg)** · [ZIP·소스·체크섬 및 변경 사항](https://github.com/JaehyunYoo/galpi/releases/tag/v0.4.1)
 
 macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타이므로 처음 실행할 때 아래의 [설치 안내](#setup)를 확인해 주세요.
 
@@ -14,7 +14,7 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 
 왼쪽에서 메모를 찾고, 본문에서 제목·체크리스트·코드를 작성합니다. **내 메모 · AI 회의록 · 전체 기록**은 같은 메모 안에서 탭으로 전환합니다.
 
-이 문서의 스크린샷은 **Galpi 0.4.0의 실제 앱 UI**를 예시 데이터로 촬영했습니다. 폴더 경로와 회의 내용은 설명용이며, 회의록 화면은 실제 AI 호출 없이 넣은 예시입니다.
+이 문서의 스크린샷은 **Galpi 0.4.1의 실제 앱 UI**를 예시 데이터로 촬영했습니다. 폴더 경로와 회의 내용은 설명용이며, 회의록 화면은 실제 AI 호출 없이 넣은 예시입니다.
 
 **현재 배포본은 macOS 13 이상을 대상으로 빌드한 Intel·Apple Silicon 공용 베타입니다.** Apple Silicon / macOS 26.3.1에서 자동 테스트를 통과했습니다. 구형 macOS와 Intel 실기기 검증, Developer ID 서명 및 Apple 공증은 아직 완료하지 않았습니다.
 
@@ -46,7 +46,7 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 
 ### 설치
 
-1. [Releases에서 DMG 설치 파일](https://github.com/JaehyunYoo/galpi/releases/tag/v0.4.0)을 내려받아 엽니다. 직접 빌드했다면 `dist/Galpi-0.4.0-universal-beta.dmg`를 사용합니다.
+1. [Releases에서 DMG 설치 파일](https://github.com/JaehyunYoo/galpi/releases/tag/v0.4.1)을 내려받아 엽니다. 직접 빌드했다면 `dist/Galpi-0.4.1-universal-beta.dmg`를 사용합니다.
 2. **Galpi.app**을 **Applications** 폴더로 드래그합니다.
 3. 응용 프로그램 폴더의 **Galpi**를 실행합니다. ZIP을 받았다면 압축을 풀고 앱을 응용 프로그램 폴더로 옮깁니다.
 4. 메모 창 오른쪽 위 **설정**에서 메모 단축키·노치, 폴더·단축키, AI·음성, 테마를 설정합니다.
@@ -272,10 +272,10 @@ macOS 13 이상, Intel·Apple Silicon 공용입니다. Apple 공증 전 베타�
 2. **설정 → AI·음성 → 회의록을 만들 AI → Claude · Claude Code 연결**을 선택합니다.
 3. 이미 Claude Code에 로그인되어 있으면 **연결 확인**으로 계정 상태를 확인합니다. 처음 사용한다면 **Claude Code 로그인**을 눌러 공식 브라우저 인증을 완료합니다.
 4. 로그인 창이 열리지 않으면 **로그인 명령 복사**를 누르고 터미널에 붙여넣어 실행합니다. 완료 후 갈피에서 **연결 확인**을 누릅니다.
-5. **Claude 회의록 모델**에서 Sonnet 또는 Opus를 선택합니다. 실제 사용 가능 모델과 사용 한도는 계정에 따릅니다.
+5. **Claude 회의록 모델**에서 **Sonnet 5.5** 또는 **Opus 5.5**를 선택합니다. 해당 모델 ID를 Claude Code에 전달하며, Claude Code **2.1.284 이상**을 사용하세요. 실제 사용 가능 모델과 사용 한도는 계정·제공자에 따릅니다. 기존 설정은 **Sonnet · 최신 자동 / Opus · 최신 자동**으로 유지하며, 자동 옵션의 실제 버전은 Claude Code 설정에 따라 달라집니다. [공식 모델 설정](https://code.claude.com/docs/en/model-config)
 6. 메모의 **AI 회의록 → 회의록 생성**을 누릅니다. ChatGPT로 다시 바꾸려면 AI 선택 항목만 변경합니다.
 
-공식 Claude Code 실행 파일을 그대로 호출하며, 로그인과 계정 관리는 Claude Code에서 진행합니다. 갈피는 Claude OAuth 토큰을 읽거나 저장하지 않습니다. Claude Code를 다른 도구에서도 사용한다면 같은 로그인 상태를 공유합니다. 일반적인 설치 위치인 `~/.local/bin/claude`, `/opt/homebrew/bin/claude`, `/usr/local/bin/claude`와 앱 실행 환경의 PATH에서 실행 파일을 찾습니다.
+현재 갈피는 Claude Code 연결을 지원하며, Claude 웹·앱 로그인 직접 연결이나 API 키 직접 입력 기능은 제공하지 않습니다. 공식 Claude Code 실행 파일을 그대로 호출하며, 로그인과 계정 관리는 Claude Code에서 진행합니다. 갈피는 Claude OAuth 토큰을 읽거나 저장하지 않습니다. Claude Code를 다른 도구에서도 사용한다면 같은 로그인 상태를 공유합니다. 일반적인 설치 위치인 `~/.local/bin/claude`, `/opt/homebrew/bin/claude`, `/usr/local/bin/claude`와 앱 실행 환경의 PATH에서 실행 파일을 찾습니다.
 
 **비용과 한도:** Claude Code에 연결한 계정과 제공자의 조건을 따릅니다. 구독 계정으로 연결해도 제3자 도구 사용에는 추가 사용 크레딧이 청구될 수 있으며, 구독에 포함된 한도만 사용한다고 보장하지 않습니다. API 또는 외부 제공자 인증이면 해당 사용량 요금이 적용될 수 있습니다. 설정에서 현재 인증 종류를 확인할 수 있습니다. [Anthropic 계정 안내](https://support.claude.com/en/articles/13189465-log-in-to-your-claude-account) · [공식 Claude Code 인증·제품 연동 안내](https://code.claude.com/docs/en/legal-and-compliance)
 
@@ -415,15 +415,15 @@ cd ~/Desktop/Galpi
 open dist
 ```
 
-기본 0.4.0 버전에서 생성되는 파일은 다음과 같습니다.
+기본 0.4.1 버전에서 생성되는 파일은 다음과 같습니다.
 
 | 결과물 | 용도 |
 | --- | --- |
-| `Galpi-0.4.0-universal-beta.dmg` | 다른 사람에게 전달할 설치 이미지. 앱, Applications 링크, 설치 안내 포함 |
-| `Galpi-0.4.0-universal-beta.zip` | 앱 번들만 압축한 파일 |
-| `Galpi-0.4.0-source.zip` | 소스·리소스·문서·빌드 스크립트 |
-| `Galpi-0.4.0-universal-beta.json` | 버전, 최소 OS, 아키텍처, 공증 여부, 기기 검증 범위 |
-| `Galpi-0.4.0-universal-beta-SHA256SUMS.txt` | DMG·앱 ZIP·소스 ZIP의 SHA-256 체크섬 |
+| `Galpi-0.4.1-universal-beta.dmg` | 다른 사람에게 전달할 설치 이미지. 앱, Applications 링크, 설치 안내 포함 |
+| `Galpi-0.4.1-universal-beta.zip` | 앱 번들만 압축한 파일 |
+| `Galpi-0.4.1-source.zip` | 소스·리소스·문서·빌드 스크립트 |
+| `Galpi-0.4.1-universal-beta.json` | 버전, 최소 OS, 아키텍처, 공증 여부, 기기 검증 범위 |
+| `Galpi-0.4.1-universal-beta-SHA256SUMS.txt` | DMG·앱 ZIP·소스 ZIP의 SHA-256 체크섬 |
 
 받는 사람에게는 **DMG 또는 앱 ZIP 하나와 설치 안내**를 전달하면 됩니다. 제작자의 데이터 폴더를 함께 보내지 않습니다. 소스 패키지는 명시된 프로젝트 파일만 포함하며 `node_modules`, `work`, `build`, `dist`, 사용자 메모·녹음·로그인 토큰은 포함하지 않습니다.
 
@@ -437,8 +437,8 @@ open dist
 
 1. 버전과 README를 갱신하고 변경된 소스를 커밋·푸시합니다.
 2. `./release.sh`로 설치 파일을 만들고 `dist/`에서 해당 버전의 체크섬을 확인합니다.
-3. 해당 소스 커밋에 `v0.4.0`와 같은 버전 태그를 지정해 GitHub 릴리즈를 만듭니다.
-4. 위 표의 파일 5개를 첨부하고 설치 방법과 검증 범위를 적습니다. 이번 배포 설명은 [`docs/releases/0.4.0.md`](docs/releases/0.4.0.md)에 보관합니다.
+3. 해당 소스 커밋에 `v0.4.1`와 같은 버전 태그를 지정해 GitHub 릴리즈를 만듭니다.
+4. 위 표의 파일 5개를 첨부하고 설치 방법과 검증 범위를 적습니다. 이번 배포 설명은 [`docs/releases/0.4.1.md`](docs/releases/0.4.1.md)에 보관합니다.
 5. 공증 전 빌드는 **Pre-release**로 표시합니다. 업로드된 파일을 확인한 뒤 릴리즈를 공개하고 README 다운로드 링크가 해당 버전을 가리키는지 확인합니다.
 
 공개한 버전의 파일을 교체하기보다 다음 버전으로 배포해 사용자가 내려받은 파일과 체크섬을 일치시킵니다.
@@ -499,7 +499,7 @@ GALPI_NOTARY_PROFILE='galpi-notary' \
 4. DMG 생성·서명 후 Apple에 제출, 승인된 DMG에도 티켓 첨부.
 5. 앱의 Gatekeeper 검사 후 최종 DMG·ZIP·소스·체크섬 생성.
 
-성공하면 `dist/Galpi-0.4.0-universal-release.dmg`와 같은 이름의 결과물이 생깁니다. 제출 결과는 `dist/notary-app-0.4.0.json`, `dist/notary-dmg-0.4.0.json`에 남습니다. 인증서와 프로필이 없는 현재 환경에서는 이 공증 경로를 실행 검증하지 않았습니다.
+성공하면 `dist/Galpi-0.4.1-universal-release.dmg`와 같은 이름의 결과물이 생깁니다. 제출 결과는 `dist/notary-app-0.4.1.json`, `dist/notary-dmg-0.4.1.json`에 남습니다. 인증서와 프로필이 없는 현재 환경에서는 이 공증 경로를 실행 검증하지 않았습니다.
 
 서명만 하려면 `GALPI_NOTARY_PROFILE`을 설정하지 않고 Developer ID를 지정합니다. 결과는 `signed-unnotarized`입니다. 임시 서명에 공증 프로필만 지정하거나 Apple Development 인증서를 전달하면 스크립트가 오류로 중단됩니다.
 
@@ -512,8 +512,8 @@ codesign --verify --strict --verbose=2 build/Release/Galpi.app
 xcrun lipo -archs build/Release/Galpi.app/Contents/MacOS/Galpi
 xcrun stapler validate build/Release/Galpi.app
 spctl --assess --type execute --verbose=2 build/Release/Galpi.app
-hdiutil verify dist/Galpi-0.4.0-universal-release.dmg
-xcrun stapler validate dist/Galpi-0.4.0-universal-release.dmg
+hdiutil verify dist/Galpi-0.4.1-universal-release.dmg
+xcrun stapler validate dist/Galpi-0.4.1-universal-release.dmg
 ```
 
 베타는 `codesign --verify`가 성공해도 `stapler`·Gatekeeper 검사에서는 통과하지 않을 수 있습니다. 실제 현재 베타의 Gatekeeper 결과는 `rejected`입니다. 정식 공증본의 검사 결과와 구분합니다.
@@ -522,7 +522,7 @@ xcrun stapler validate dist/Galpi-0.4.0-universal-release.dmg
 
 ```sh
 cd dist
-shasum -a 256 -c Galpi-0.4.0-universal-release-SHA256SUMS.txt
+shasum -a 256 -c Galpi-0.4.1-universal-release-SHA256SUMS.txt
 ```
 
 베타라면 위 파일명에서 `release`를 `beta`로 바꿉니다. 내려받은 실제 DMG·ZIP을 다른 Mac에서 설치해 첫 실행·권한·녹음·로그인을 확인한 뒤 배포합니다. [Apple 공증 안내](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)

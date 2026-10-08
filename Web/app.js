@@ -164,7 +164,7 @@ function aiProvider(){return library.preferences.aiProvider==='claude'?'claude':
 function renderAI(){
   const useClaude=aiProvider()==='claude';
   $('#ai-provider').value=aiProvider();$('#chatgpt-settings').hidden=useClaude;$('#claude-settings').hidden=!useClaude;
-  $('#claude-model').value=library.preferences.claudeModel||'sonnet';
+  $('#claude-model').value=library.preferences.claudeModel||'claude-sonnet-5-5';
   $('#summary-provider-hint').textContent=`전체 기록과 직접 쓴 메모를 ${useClaude?'Claude':'ChatGPT'}에 보내 요약·결정 사항·할 일을 정리해요.`;
   $('#claude-status').textContent=claude.message||'연결 확인을 눌러 주세요.';
   const busy=claude.checking||claude.signingIn;

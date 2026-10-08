@@ -52,7 +52,7 @@ import WebKit
                     }
                 }
                 let aiPreferences = try Store(root: delegate.store.root).library.preferences
-                guard aiPreferences.effectiveAIProvider == "claude", aiPreferences.effectiveClaudeModel == "opus" else { throw AppError("Claude provider/model persistence failed") }
+                guard aiPreferences.effectiveAIProvider == "claude", aiPreferences.effectiveClaudeModel == "claude-opus-5-5" else { throw AppError("Claude provider/model persistence failed") }
                 guard let notch = delegate.notch else { throw AppError("Missing notch controller") }
                 notch.refresh(); notch.toggle()
                 guard notch.state.expanded, let geometry = notch.geometry,

@@ -82,7 +82,7 @@ import Darwin
         guard let executable else { throw AppError("설정 → AI·음성에서 Claude Code를 설치하고 연결해 주세요.") }
         try await refresh()
         guard connected, !signingIn, !checking else { throw AppError("Claude Code 로그인을 완료하고 다시 시도해 주세요.") }
-        guard ["sonnet", "opus"].contains(model) else { throw AppError("Claude 회의록 모델을 선택해 주세요.") }
+        guard ClaudeModels.supported.contains(model) else { throw AppError("Claude 회의록 모델을 선택해 주세요.") }
         let chunks = ChatGPT.chunks(text, limit: 24000)
         guard !chunks.isEmpty else { throw AppError("회의 내용이 비어 있어요.") }
         var parts: [String] = []

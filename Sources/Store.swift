@@ -52,7 +52,7 @@ struct Preferences: Codable {
     var aiProvider: String?
     var claudeModel: String?
     var effectiveAIProvider: String { aiProvider == "claude" ? "claude" : "chatgpt" }
-    var effectiveClaudeModel: String { claudeModel ?? "sonnet" }
+    var effectiveClaudeModel: String { claudeModel ?? ClaudeModels.defaultModel }
     var compact = false
     var alwaysOnTop = false
     var theme: String?
@@ -144,4 +144,10 @@ final class Store {
     static func decode<T: Decodable>(_ type: T.Type, from value: Any) throws -> T {
         try JSONDecoder().decode(type, from: JSONSerialization.data(withJSONObject: value))
     }
+}
+
+// Keep legacy aliases distinct from explicitly selected model versions.
+enum ClaudeModels {
+    static let defaultModel = "claude-sonnet-5-5"
+    static let supported = ["claude-sonnet-5-5", "claude-opus-5-5", "sonnet", "opus"]
 }

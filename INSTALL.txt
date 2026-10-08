@@ -1,4 +1,4 @@
-Galpi 0.4.0 — macOS 13 이상 / Intel·Apple Silicon 공용
+Galpi 0.4.1 — macOS 13 이상 / Intel·Apple Silicon 공용
 
 설치
 1. DMG를 열고 Galpi.app을 Applications 폴더로 드래그합니다.

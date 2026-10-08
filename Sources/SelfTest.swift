@@ -8,7 +8,7 @@ enum SelfTest {
         // New preferences remain optional so older libraries decode without losing notes.
         let legacyPreferences = Data(#"{"launcher":{"key":49,"modifiers":6144,"label":"⌃ ⌥ Space"},"locale":"ko-KR","model":"","compact":false,"alwaysOnTop":false}"#.utf8)
         var prefs = try JSONDecoder().decode(Preferences.self, from: legacyPreferences)
-        guard prefs.effectiveMemoShortcut.key == 45, prefs.effectiveNotchShortcut.key == 5, prefs.effectiveNotchShortcut.modifiers == 6144, prefs.notchEnabled == nil, prefs.effectiveAIProvider == "chatgpt", prefs.effectiveClaudeModel == "sonnet" else { throw AppError("Legacy notch / memo shortcut defaults failed") }
+        guard prefs.effectiveMemoShortcut.key == 45, prefs.effectiveNotchShortcut.key == 5, prefs.effectiveNotchShortcut.modifiers == 6144, prefs.notchEnabled == nil, prefs.effectiveAIProvider == "chatgpt", prefs.effectiveClaudeModel == "claude-sonnet-5-5" else { throw AppError("Legacy notch / memo shortcut defaults failed") }
         prefs.notchEnabled = false; prefs.memoShortcut = Shortcut(key: 46, modifiers: 6144, label: "⌃ ⌥ M")
         prefs.notchShortcut = Shortcut(key: 5, modifiers: 6400, label: "⌃ ⌥ ⇧ G")
         let restoredPrefs = try JSONDecoder().decode(Preferences.self, from: JSONEncoder().encode(prefs))
@@ -100,8 +100,14 @@ enum SelfTest {
         let client = ClaudeCLI(executable: fixture)
         try await client.refresh()
         guard client.connected, client.authMethod == "claude.ai" else { throw AppError("Claude login status parsing failed") }
-        let summary = try await client.summarize(text: "회의 내용", model: "sonnet", progress: { _ in })
-        guard summary.contains("fixture 회의록") else { throw AppError("Claude subprocess summary failed") }
+        for model in ClaudeModels.supported {
+            let summary = try await client.summarize(text: "회의 내용", model: model, progress: { _ in })
+            guard summary.contains("fixture 회의록") else { throw AppError("Claude subprocess summary failed") }
+            let arguments = ClaudeCLI.summaryArguments(model: model)
+            guard let index = arguments.firstIndex(of: "--model"), arguments[index + 1] == model else { throw AppError("Claude model version was not forwarded") }
+            let stored = try JSONDecoder().decode(Preferences.self, from: JSONEncoder().encode(Preferences(claudeModel: model)))
+            guard stored.effectiveClaudeModel == model else { throw AppError("Claude model preference changed on reload") }
+        }
         for payload in [#"{"type":"result","subtype":"success","is_error":true,"result":"실패"}"#,
                         #"{"type":"result","subtype":"error_max_turns","is_error":false,"result":"미완료"}"#,
                         #"{"type":"result","subtype":"success","is_error":false,"result":" "}"#] {

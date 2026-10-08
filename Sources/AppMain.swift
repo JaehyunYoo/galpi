@@ -304,7 +304,7 @@ import UniformTypeIdentifiers
         case "preferences":
             let previous=store.library.preferences
             if let provider = a["aiProvider"] as? String, !["chatgpt", "claude"].contains(provider) { throw AppError("지원하지 않는 AI 서비스예요.") }
-            if let model = a["claudeModel"] as? String, !["sonnet", "opus"].contains(model) { throw AppError("지원하지 않는 Claude 모델이에요.") }
+            if let model = a["claudeModel"] as? String, !ClaudeModels.supported.contains(model) { throw AppError("지원하지 않는 Claude 모델이에요.") }
             if let theme=a["theme"] as? String {
                 guard ["system","light","dark"].contains(theme) || (store.library.preferences.customThemes ?? []).contains(where:{$0.id==theme}) else {throw AppError("지원하지 않는 화면 모드예요.")}
                 store.library.preferences.theme=theme

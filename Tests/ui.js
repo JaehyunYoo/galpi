@@ -110,12 +110,14 @@ $('#ai-provider').value='claude';$('#ai-provider').dispatchEvent(new Event('chan
 await until(()=>!$('#claude-settings').hidden&&$('#chatgpt-settings').hidden,'Claude provider panel');
 await until(()=>$('#claude-sign-in').disabled&&$('#claude-status').textContent.includes('설치'),'Missing CLI offers installation without reading real credentials');
 check($('#summary-provider-hint').textContent.includes('Claude'),'Summary destination follows provider');
-$('#claude-model').value='opus';$('#claude-model').dispatchEvent(new Event('change',{bubbles:true}));
+check($('#claude-model').value==='claude-sonnet-5-5','New Claude default is Sonnet 5.5');
+check($('#claude-model option[value=sonnet]').textContent.includes('최신 자동'),'Legacy alias is labeled honestly');
+$('#claude-model').value='claude-opus-5-5';$('#claude-model').dispatchEvent(new Event('change',{bubbles:true}));
 await pause(150);
 $('#ai-provider').value='chatgpt';$('#ai-provider').dispatchEvent(new Event('change',{bubbles:true}));
 await until(()=>!$('#chatgpt-settings').hidden,'Switch back to ChatGPT');
 $('#ai-provider').value='claude';$('#ai-provider').dispatchEvent(new Event('change',{bubbles:true}));
-await until(()=>!$('#claude-settings').hidden&&$('#claude-model').value==='opus','Claude model preserved across provider switch');
+await until(()=>!$('#claude-settings').hidden&&$('#claude-model').value==='claude-opus-5-5','Claude model preserved across provider switch');
 $('#settings-close').click();
 await window.Galpi.flushAsync();
 return 'Korean notes, autosave, archive/restore, code highlighting/language/persistence/read-only state and custom themes passed';
